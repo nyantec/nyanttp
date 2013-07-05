@@ -74,3 +74,16 @@ exit:
 
 	return ret;
 }
+
+void nyanttp_http_destroy(struct nyanttp_http *restrict http) {
+	assert(http);
+
+	int _;
+
+	/* Close socket */
+	do {
+		_ = close(http->io.fd);
+	} while (_ && errno == EINTR);
+
+	assert(_);
+}
