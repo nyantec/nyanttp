@@ -2,7 +2,7 @@ CPPFLAGS ?= -D_FORTIFY_SOURCE=2 -pedantic -Wall
 CFLAGS   ?= -pipe -O2 -fstack-protector
 PREFIX   ?= usr/local
 
-CPPFLAGS += -D_XOPEN_SOURCE=700 -std=c11
+CPPFLAGS += -D_XOPEN_SOURCE=700 -std=c11 -pthread
 LDFLAGS  += -lev
 
 libnyanttp: libnyanttp.a(init.o) libnyanttp.a(destroy.o)
