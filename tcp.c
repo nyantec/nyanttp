@@ -11,7 +11,7 @@
 #include <defy/restrict>
 
 #include "nyanttp.h"
-#include "http.h"
+#include "tcp.h"
 
 static struct addrinfo const hints = {
 	.ai_flags =
@@ -40,8 +40,8 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 	}
 }
 
-int nyanttp_http_init(struct nyanttp_http *restrict http, char const *restrict node, char const *restrict service) {
-	assert(http);
+int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, char const *restrict node, char const *restrict service) {
+	assert(tcp);
 
 	int _;
 	int ret = 0;
@@ -86,7 +86,7 @@ int nyanttp_http_init(struct nyanttp_http *restrict http, char const *restrict n
 	assert(_);
 
 	/* Initialise I/O watcher */
-	ev_io_init(&http->io, nil, fd, EV_READ);
+	ev_io_init(&tcp->io, nil, fd, EV_READ);
 
 exit:
 	if (likely(res))
@@ -95,32 +95,32 @@ exit:
 	return ret;
 }
 
-void nyanttp_http_destroy(struct nyanttp_http *restrict http) {
-	assert(http);
+void nyanttp_tcp_destroy(struct nyanttp_tcp *restrict tcp) {
+	assert(tcp);
 
 	int _;
 
 	/* Close socket */
 	do {
-		_ = close(http->io.fd);
+		_ = close(tcp->io.fd);
 	} while (_ && errno == EINTR);
 
 	assert(_);
 }
 
-int nyanttp_http_listen(struct nyanttp_http *restrict http, struct nyanttp *restrict ctx) {
-	assert(http);
+int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp, struct nyanttp *restrict ctx) {
+	assert(tcp);
 	assert(ctx);
 
 	int ret = 0;
 
 	/* Listen on socket */
-	if (listen(http->io.fd, SOMAXCONN)) {
+	if (listen(tcp->io.fd, SOMAXCONN)) {
 		ret = errno;
 		goto exit;
 	}
 
-	ev_io_start(ctx->loop, &http->io);
+	ev_io_start(ctx->loop, &tcp->io);
 
 exit:
 	return ret;
