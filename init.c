@@ -11,13 +11,24 @@
 
 #include "nyanttp.h"
 
+static pthread_once_t once = PTHREAD_ONCE_INIT;
+
 static void atfork() {
 	ev_loop_fork(EV_DEFAULT);
+}
+
+static void setup_once() {
+	int _;
+
+	/* Register fork handler */
+	_ = pthread_atfork(nil, nil, atfork);
+	assert(!_);
 }
 
 int nyanttp_init(struct nyanttp *restrict ctx) {
 	assert(ctx);
 
+	int _;
 	int ret = 0;
 
 	/* Initialise default loop */
@@ -27,12 +38,9 @@ int nyanttp_init(struct nyanttp *restrict ctx) {
 		goto exit;
 	}
 
-	/* Register fork handler */
-	int pth_ret = pthread_atfork(nil, nil, atfork);
-	if (unlikely(pth_ret)) {
-		ret = pth_ret;
-		goto exit;
-	}
+	/* One-time initialisation */
+	_ = pthread_once(&once, setup_once);
+	assert(!_);
 
 exit:
 	return ret;
