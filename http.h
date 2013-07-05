@@ -35,8 +35,6 @@ extern void nyanttp_http_destroy(struct nyanttp_http *restrict http);
 
 extern int nyanttp_http_listen(struct nyanttp_http *restrict http, struct nyanttp *restrict ctx);
 
-extern int nyanttp_http_unlisten(struct nyanttp_http *restrict http, struct nyanttp *restrict ctx);
-
 #if defined __cplusplus
 }
 #endif
