@@ -89,3 +89,21 @@ void nyanttp_http_destroy(struct nyanttp_http *restrict http) {
 
 	assert(_);
 }
+
+int nyanttp_http_listen(struct nyanttp_http *restrict http, struct nyanttp *restrict ctx) {
+	assert(http);
+	assert(ctx);
+
+	int ret = 0;
+
+	/* Listen on socket */
+	if (listen(http->io.fd, SOMAXCONN)) {
+		ret = errno;
+		goto exit;
+	}
+
+	ev_io_start(ctx->loop, &http->io);
+
+exit:
+	return ret;
+}
