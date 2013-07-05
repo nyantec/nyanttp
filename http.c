@@ -53,6 +53,19 @@ int nyanttp_http_init(struct nyanttp_http *restrict http, char const *restrict n
 		goto exit;
 	}
 
+	/* Close socket on exec */
+	_ = fcntl(fd, F_GETFD);
+	assert(_ >= 0);
+	_ = fcntl(fd, F_SETFD, _ | FD_CLOEXEC);
+	assert(_);
+
+	/* Mark socket as non-blocking */
+	_ = fcntl(fd, F_GETFL);
+	assert(_ >= 0);
+	_ = fcntl(fd, F_SETFL, _ | O_NONBLOCK);
+	assert(_);
+
+	/* Initialise I/O watcher */
 	ev_io_init(&http->io, nil, fd, EV_READ);
 
 exit:
