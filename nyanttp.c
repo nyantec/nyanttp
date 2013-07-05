@@ -45,3 +45,10 @@ int nyanttp_init(struct nyanttp *restrict ctx) {
 exit:
 	return ret;
 }
+
+void nyanttp_destroy(struct nyanttp *restrict ctx) {
+	assert(ctx);
+
+	assert(ctx->loop);
+	ctx->loop = nil;
+}

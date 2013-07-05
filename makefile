@@ -5,7 +5,7 @@ PREFIX   ?= usr/local
 CPPFLAGS += -D_XOPEN_SOURCE=700 -std=c11 -pthread
 LDFLAGS  += -lev
 
-libnyanttp: libnyanttp.a(init.o) libnyanttp.a(destroy.o)
+libnyanttp: libnyanttp.a(nyanttp.o)
 
 .c.a:
 	@set -e; \
