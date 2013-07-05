@@ -27,7 +27,7 @@ extern int nyanttp_init(struct nyanttp *restrict ctx);
  *
  * \param ctx Pointer to context structure
  */
-extern int nyanttp_destroy(struct nyanttp *restrict ctx);
+extern void nyanttp_destroy(struct nyanttp *restrict ctx);
 
 #if defined __cplusplus
 }
