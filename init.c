@@ -2,6 +2,7 @@
 #include <errno.h>
 
 #include <defy/expect>
+#include <defy/restrict>
 
 #include <ev.h>
 

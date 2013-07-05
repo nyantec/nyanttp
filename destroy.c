@@ -1,6 +1,7 @@
 #include <assert.h>
 
 #include <defy/nil>
+#include <defy/restrict>
 
 #include "nyanttp.h"
 

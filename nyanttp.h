@@ -8,6 +8,8 @@ extern "C" {
 
 #include <ev.h>
 
+#include <defy/restrict>
+
 /**
  * \brief Context structure
  */
