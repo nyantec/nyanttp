@@ -22,6 +22,24 @@ static struct addrinfo const hints = {
 	.ai_protocol = IPPROTO_TCP
 };
 
+static void listen_event(EV_P_ ev_io io, int revents) {
+	if (likely(revents | EV_READ)) {
+		/* Accept up to 256 new connections */
+		for (unsigned iter = 0; iter <= 255; ++iter) {
+			int fd;
+			do {
+				fd = accept(io.fd, nil, nil);
+			} while (fd < 0 && errno == EINTR);
+
+			/* FIXME: Proper error handling */
+			if (unlikely(fd < 0))
+				break;
+
+			/* TODO: Handle connection */
+		}
+	}
+}
+
 int nyanttp_http_init(struct nyanttp_http *restrict http, char const *restrict node, char const *restrict service) {
 	assert(http);
 
