@@ -1,0 +1,7 @@
+# Hidden files
+.*
+!.gitignore
+
+# Binaries
+*.a
+*.o
