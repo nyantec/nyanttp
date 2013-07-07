@@ -10,11 +10,14 @@ extern "C" {
 
 #include <defy/restrict>
 
+#include "error.h"
+
 /**
  * \brief Context structure
  */
 struct nyanttp {
-	struct ev_loop *loop;     /**< Event loop */
+	struct ev_loop *loop; /**< Event loop */
+	struct nyanttp_error error; /**< Last error */
 };
 
 /**

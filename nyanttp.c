@@ -34,6 +34,8 @@ int nyanttp_init(struct nyanttp *restrict ctx) {
 	/* Initialise default loop */
 	ctx->loop = ev_default_loop(EVFLAG_AUTO);
 	if (unlikely(!ctx->loop)) {
+		ctx->error.domain = NYANTTP_ERROR_DOMAIN_NYAN;
+		ctx->error.code= NYANTTP_ERROR_EVINIT;
 		ret = -1;
 		goto exit;
 	}
