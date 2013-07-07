@@ -19,15 +19,9 @@ enum nyanttp_error_nyan {
 	NYANTTP_ERROR_EVINIT,
 };
 
-union nyanttp_error_code {
-	unsigned nyan;
-	int errno;
-	int gai;
-};
-
 struct nyanttp_error {
 	enum nyanttp_error_domain domain;
-	union nyanttp_error_code code;
+	int code;
 };
 
 /**

@@ -26,25 +26,25 @@ char const *nyanttp_error(struct nyanttp_error const *restrict error) {
 	switch (error->domain) {
 	case NYANTTP_ERROR_DOMAIN_NYAN:
 		/* Check if error code inside bounds */
-		if (unlikely(error->code.nyan >= sizeof error_map / sizeof *error_map))
+		if (unlikely(error->code >= sizeof error_map / sizeof *error_map))
 			break;
 
 		/* Check if error code is known */
-		if (unlikely(!error_map[error->code.nyan]))
+		if (unlikely(!error_map[error->code]))
 			break;
 
-		string = error_map[error->code.nyan];
+		string = error_map[error->code];
 		break;
 
 	case NYANTTP_ERROR_DOMAIN_ERRNO:
-		if (unlikely(strerror_r(error->code.errno, error_buf, sizeof error_buf)))
+		if (unlikely(strerror_r(error->code, error_buf, sizeof error_buf)))
 			break;
 
 		string = error_buf;
 		break;
 
 	case NYANTTP_ERROR_DOMAIN_GAI:
-		string = gai_strerror(error->code.gai);
+		string = gai_strerror(error->code);
 		break;
 	}
 
