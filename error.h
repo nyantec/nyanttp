@@ -6,6 +6,8 @@
 extern "C" {
 #endif
 
+#include <defy/nothrow>
+
 /**
  * \brief Error domain
  */
@@ -31,7 +33,7 @@ struct nyanttp_error {
  *
  * \return Pointer to error description
  */
-extern char const *nyanttp_error(struct nyanttp_error const *restrict error);
+extern char const *nyanttp_error(struct nyanttp_error const *restrict error) nothrow;
 
 #if defined __cplusplus
 }

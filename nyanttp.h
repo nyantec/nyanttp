@@ -8,6 +8,7 @@ extern "C" {
 
 #include <ev.h>
 
+#include <defy/nothrow>
 #include <defy/restrict>
 
 #include "error.h"
@@ -25,14 +26,14 @@ struct nyanttp {
  *
  * \param ctx Pointer to context structure
  */
-extern int nyanttp_init(struct nyanttp *restrict ctx);
+extern int nyanttp_init(struct nyanttp *restrict ctx) nothrow;
 
 /**
  * \brief Destroy context
  *
  * \param ctx Pointer to context structure
  */
-extern void nyanttp_destroy(struct nyanttp *restrict ctx);
+extern void nyanttp_destroy(struct nyanttp *restrict ctx) nothrow;
 
 #if defined __cplusplus
 }
