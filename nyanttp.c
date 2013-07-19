@@ -31,6 +31,15 @@ int nyanttp_init(struct nyanttp *restrict ctx) {
 	int _;
 	int ret = 0;
 
+	/* Check libev version */
+	if (unlikely(ev_version_major() != EV_VERSION_MAJOR
+		|| ev_version_minor() < EV_VERSION_MINOR)) {
+		ctx->error.domain = NYANTTP_ERROR_DOMAIN_NYAN;
+		ctx->error.code= NYANTTP_ERROR_EVVER;
+		ret = -1;
+		goto exit;
+	}
+
 	/* Initialise default loop */
 	ctx->loop = ev_default_loop(EVFLAG_AUTO);
 	if (unlikely(!ctx->loop)) {
