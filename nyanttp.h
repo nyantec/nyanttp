@@ -14,12 +14,32 @@ extern "C" {
 #include "error.h"
 
 /**
+ * \brief Major version number
+ */
+#define NYANTTP_VERSION_MAJOR 0u
+
+/**
+ * \brief Minor version number
+ */
+#define NYANTTP_VERSION_MINOR 0u
+
+/**
  * \brief Context structure
  */
 struct nyanttp {
 	struct ev_loop *loop; /**< Event loop */
 	struct nyanttp_error error; /**< Last error */
 };
+
+/**
+ * \brief Get major version number
+ */
+extern unsigned int nyanttp_version_major() nothrow;
+
+/**
+ * \brief Get minor version number
+ */
+extern unsigned int nyanttp_version_minor() nothrow;
 
 /**
  * \brief Initialise context
