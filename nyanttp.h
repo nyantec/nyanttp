@@ -46,7 +46,15 @@ extern unsigned int nyanttp_version_minor() nothrow;
  *
  * \param ctx Pointer to context structure
  */
-extern int nyanttp_init(struct nyanttp *restrict ctx) nothrow;
+#define nyanttp_init(ctx) ( \
+	(nyanttp_version_major() == NYANTTP_VERSION_MAJOR \
+		&& nyanttp_version_minor() >= NYANTTP_VERSION_MINOR) \
+		? nyanttp_init_(ctx) \
+		: ((ctx)->error.domain = NYANTTP_ERROR_DOMAIN_NYAN, \
+			(ctx)->error.code = NYANTTP_ERROR_VERSION, -1) \
+	)
+
+extern int nyanttp_init_(struct nyanttp *restrict ctx) nothrow;
 
 /**
  * \brief Destroy context

@@ -17,6 +17,7 @@ static thread_local char error_buf[256];
  * \brief Error message map
  */
 static char const *const error_map[] = {
+	[NYANTTP_ERROR_VERSION] = "nyanttp version mismatch",
 	[NYANTTP_ERROR_EVVER] = "libev version mismatch",
 	[NYANTTP_ERROR_EVINIT] = "Failed to initialise libev event loop"
 };
