@@ -42,8 +42,7 @@ int nyanttp_init_(struct nyanttp *restrict ctx) {
 	/* Check libev version */
 	if (unlikely(ev_version_major() != EV_VERSION_MAJOR
 		|| ev_version_minor() < EV_VERSION_MINOR)) {
-		ctx->error.domain = NYANTTP_ERROR_DOMAIN_NYAN;
-		ctx->error.code= NYANTTP_ERROR_EVVER;
+		nyanttp_error_set(&ctx->error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_EVVER);
 		ret = -1;
 		goto exit;
 	}
@@ -51,8 +50,7 @@ int nyanttp_init_(struct nyanttp *restrict ctx) {
 	/* Initialise default loop */
 	ctx->loop = ev_default_loop(EVFLAG_AUTO);
 	if (unlikely(!ctx->loop)) {
-		ctx->error.domain = NYANTTP_ERROR_DOMAIN_NYAN;
-		ctx->error.code= NYANTTP_ERROR_EVINIT;
+		nyanttp_error_set(&ctx->error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_EVINIT);
 		ret = -1;
 		goto exit;
 	}
