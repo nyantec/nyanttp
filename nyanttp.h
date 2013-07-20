@@ -1,3 +1,9 @@
+/**
+ * \file
+ *
+ * \brief Main header
+ */
+
 #pragma once
 #ifndef __nyanttp__
 #define __nyanttp__
@@ -33,11 +39,15 @@ struct nyanttp {
 
 /**
  * \brief Get major version number
+ *
+ * \return Major version number
  */
 extern unsigned int nyanttp_version_major() nothrow;
 
 /**
  * \brief Get minor version number
+ *
+ * \return Minor version number
  */
 extern unsigned int nyanttp_version_minor() nothrow;
 
@@ -45,6 +55,8 @@ extern unsigned int nyanttp_version_minor() nothrow;
  * \brief Initialise context
  *
  * \param ctx Pointer to context structure
+ *
+ * \return Zero on success or non-zero on error
  */
 #define nyanttp_init(ctx) ( \
 	(nyanttp_version_major() == NYANTTP_VERSION_MAJOR \
