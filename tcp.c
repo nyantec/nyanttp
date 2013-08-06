@@ -47,11 +47,11 @@ static void conn_event(EV_P_ ev_io io, int revents) {
 	struct nyanttp_tcp_conn *conn = (struct nyanttp_tcp_conn *) io.data;
 
 	if (revents & EV_READ) {
-		conn->tcp->event_readable(conn);
+		conn->tcp->event_conn_readable(conn);
 	}
 
 	if (revents & EV_WRITE) {
-		conn->tcp->event_writable(conn);
+		conn->tcp->event_conn_writable(conn);
 	}
 }
 
@@ -70,13 +70,22 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			/* Assume that all addresses are IPv6 */
 			assert(address.sin6_family == AF_INET6);
 
-			/* FIXME: Proper error handling */
-			if (unlikely(fd < 0))
+			/* Handle errors */
+			if (unlikely(fd < 0)) {
+				if (unlikely(errno != EAGAIN && errno != EWOULDBLOCK)) {
+					if (tcp->event_tcp_error) {
+						struct nyanttp_error error;
+						nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_ERRNO, errno);
+						tcp->event_tcp_error(tcp, &error);
+					}
+				}
+
 				break;
+			}
 
 			/* Raise connect event */
-			if (tcp->event_connect) {
-				if (unlikely(!tcp->event_connect(tcp, &address))) {
+			if (tcp->event_tcp_connect) {
+				if (unlikely(!tcp->event_tcp_connect(tcp, &address))) {
 					/* Reject connection */
 					safe_close(fd);
 					continue;
@@ -86,7 +95,15 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			/* Allocate memory for connection structure */
 			struct nyanttp_tcp_conn *conn = malloc(sizeof (struct nyanttp_tcp_conn));
 			if (unlikely(!conn)) {
-				/* TODO: Handle error */
+				if (tcp->event_tcp_error) {
+					struct nyanttp_error error;
+					nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_ERRNO, errno);
+					tcp->event_tcp_error(tcp, &error);
+				}
+
+				/* Close connection */
+				safe_close(fd);
+				break;
 			}
 
 			/* Initialise event watcher */
@@ -105,7 +122,11 @@ int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, char const *restrict node
 
 	/* Initialise structure */
 	tcp->data = nil;
-	tcp->event_connect = nil;
+	tcp->event_tcp_error = nil;
+	tcp->event_tcp_connect = nil;
+	tcp->event_conn_error = nil;
+	tcp->event_conn_readable = nil;
+	tcp->event_conn_writable = nil;
 
 	struct addrinfo *res;
 

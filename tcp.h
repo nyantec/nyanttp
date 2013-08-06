@@ -24,9 +24,12 @@ struct nyanttp_tcp_conn;
 struct nyanttp_tcp {
 	void *data; /**< User data */
 	struct ev_io io; /**< I/O listener */
-	bool (*event_connect)(struct nyanttp_tcp *restrict, struct sockaddr_in6 *restrict); /**< Connect event handler */
-	void (*event_readable)(struct nyanttp_tcp_conn *restrict);
-	void (*event_writable)(struct nyanttp_tcp_conn *restrict);
+	void (*event_tcp_error)(struct nyanttp_tcp *restrict, struct nyanttp_error const *restrict);
+	bool (*event_tcp_connect)(struct nyanttp_tcp *restrict, struct sockaddr_in6 const *restrict); /**< Connect event handler */
+
+	void (*event_conn_error)(struct nyanttp_tcp_conn *restrict, struct nyanttp_error const *restrict);
+	void (*event_conn_readable)(struct nyanttp_tcp_conn *restrict);
+	void (*event_conn_writable)(struct nyanttp_tcp_conn *restrict);
 };
 
 /**
