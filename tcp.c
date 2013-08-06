@@ -47,11 +47,13 @@ static void conn_event(EV_P_ ev_io io, int revents) {
 	struct nyanttp_tcp_conn *conn = (struct nyanttp_tcp_conn *) io.data;
 
 	if (revents & EV_READ) {
-		conn->tcp->event_conn_readable(conn);
+		if (conn->tcp->event_conn_readable)
+			conn->tcp->event_conn_readable(conn);
 	}
 
 	if (revents & EV_WRITE) {
-		conn->tcp->event_conn_writable(conn);
+		if (conn->tcp->event_conn_writable)
+			conn->tcp->event_conn_writable(conn);
 	}
 }
 
