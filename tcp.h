@@ -23,6 +23,7 @@ struct nyanttp_tcp_conn;
  */
 struct nyanttp_tcp {
 	void *data; /**< User data */
+	struct nyanttp *ctx; /**< Context structure */
 	struct ev_io io; /**< I/O listener */
 	void (*event_tcp_error)(struct nyanttp_tcp *restrict, struct nyanttp_error const *restrict);
 	bool (*event_tcp_connect)(struct nyanttp_tcp *restrict, struct sockaddr_in6 const *restrict); /**< Connect event handler */
@@ -48,10 +49,11 @@ struct nyanttp_tcp_conn {
  * \brief Initialise TCP context
  *
  * \param tcp Pointer to TCP listener
+ * \param ctx Pointer to context structure
  * \param node Host name or address
  * \param service Service name or port number
  */
-extern int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, char const *restrict node, char const *restrict service);
+extern int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, struct nyanttp *restrict ctx, char const *restrict node, char const *restrict service);
 
 /**
  * \brief Destroy TCP context
@@ -60,7 +62,7 @@ extern int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, char const *restri
  */
 extern void nyanttp_tcp_destroy(struct nyanttp_tcp *restrict tcp);
 
-extern int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp, struct nyanttp *restrict ctx);
+extern int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp);
 
 #if defined __cplusplus
 }

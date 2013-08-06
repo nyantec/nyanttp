@@ -114,14 +114,16 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 	}
 }
 
-int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, char const *restrict node, char const *restrict service) {
+int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, struct nyanttp *restrict ctx, char const *restrict node, char const *restrict service) {
 	assert(tcp);
+	assert(ctx);
 
 	int _;
 	int ret = 0;
 
 	/* Initialise structure */
 	tcp->data = nil;
+	tcp->ctx = ctx;
 	tcp->event_tcp_error = nil;
 	tcp->event_tcp_connect = nil;
 	tcp->event_conn_error = nil;
@@ -189,9 +191,8 @@ void nyanttp_tcp_destroy(struct nyanttp_tcp *restrict tcp) {
 	assert(_);
 }
 
-int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp, struct nyanttp *restrict ctx) {
+int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp) {
 	assert(tcp);
-	assert(ctx);
 
 	int ret = 0;
 
@@ -201,7 +202,7 @@ int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp, struct nyanttp *restric
 		goto exit;
 	}
 
-	ev_io_start(ctx->loop, &tcp->io);
+	ev_io_start(tcp->ctx->loop, &tcp->io);
 
 exit:
 	return ret;
