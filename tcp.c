@@ -58,7 +58,7 @@ static void conn_event(EV_P_ ev_io io, int revents) {
 static void listen_event(EV_P_ ev_io io, int revents) {
 	struct nyanttp_tcp *tcp = (struct nyanttp_tcp *) io.data;
 
-	if (likely(revents | EV_READ)) {
+	if (likely(revents & EV_READ)) {
 		/* Accept up to 256 new connections */
 		for (unsigned iter = 0; iter <= 255; ++iter) {
 			struct sockaddr_in6 address;
