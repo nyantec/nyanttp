@@ -78,7 +78,7 @@ static void timeout_event(EV_P_ ev_timer timer, int revents) {
 			if (unlikely(conn->tcp->event_conn_timeout(conn)))
 				return;
 
-		/* TODO: Destroy connection */
+		nyanttp_tcp_conn_destroy(conn);
 	}
 }
 
@@ -245,6 +245,20 @@ int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp) {
 
 exit:
 	return ret;
+}
+
+void nyanttp_tcp_conn_destroy(struct nyanttp_tcp_conn *restrict conn) {
+	assert(conn);
+
+	/* Stop watchers */
+	ev_io_stop(conn->tcp->ctx->loop, &conn->io);
+	ev_timer_stop(conn->tcp->ctx->loop, &conn->timer);
+
+	/* Close socket */
+	safe_close(conn->io.fd);
+
+	/* Free structure */
+	free(conn);
 }
 
 void nyanttp_tcp_conn_touch(struct nyanttp_tcp_conn *restrict conn) {

@@ -42,7 +42,6 @@ struct nyanttp_tcp_conn {
 	struct nyanttp_tcp *tcp; /**< TCP listener */
 	struct ev_timer timer; /**< Timeout watcher */
 	struct ev_io io; /**< I/O watcher */
-	/* TODO: Event listeners */
 };
 
 
@@ -65,6 +64,8 @@ extern int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, struct nyanttp *re
 extern void nyanttp_tcp_destroy(struct nyanttp_tcp *restrict tcp);
 
 extern int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp);
+
+extern void nyanttp_tcp_conn_destroy(struct nyanttp_tcp_conn *restrict conn);
 
 extern void nyanttp_tcp_conn_touch(struct nyanttp_tcp_conn *restrict conn);
 
