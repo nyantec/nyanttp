@@ -48,7 +48,7 @@ static void conn_event(EV_P_ ev_io io, int revents) {
 
 	if (unlikely(revents & EV_ERROR)) {
 		struct nyanttp_error error;
-		nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTP_ERROR_EVWATCH);
+		nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_EVWATCH);
 		conn->tcp->event_conn_error(conn, &error);
 	}
 	else {
@@ -64,12 +64,30 @@ static void conn_event(EV_P_ ev_io io, int revents) {
 	}
 }
 
+static void timeout_event(EV_P_ ev_timer timer, int revents) {
+	struct nyanttp_tcp_conn *conn = (struct nyanttp_tcp_conn *) timer.data;
+
+	if (unlikely(revents & EV_ERROR)) {
+		struct nyanttp_error error;
+		nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_EVWATCH);
+		conn->tcp->event_conn_error(conn, &error);
+	}
+	else if (likely(revents & EV_TIMEOUT)) {
+		/* Raise timeout event */
+		if (conn->tcp->event_conn_timeout)
+			if (unlikely(conn->tcp->event_conn_timeout(conn)))
+				return;
+
+		/* TODO: Destroy connection */
+	}
+}
+
 static void listen_event(EV_P_ ev_io io, int revents) {
 	struct nyanttp_tcp *tcp = (struct nyanttp_tcp *) io.data;
 
 	if (unlikely(revents & EV_ERROR)) {
 		struct nyanttp_error error;
-		nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTP_ERROR_EVWATCH);
+		nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_EVWATCH);
 		tcp->event_tcp_error(tcp, &error);
 	}
 	else if (likely(revents & EV_READ)) {
@@ -120,7 +138,13 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 				break;
 			}
 
-			/* Initialise event watcher */
+			/* Initialise timeout watcher */
+			/* FIXME: Hard-coded timeout value */
+			ev_timer_init(&conn->timer, timeout_event, 60.0, 60.0);
+			conn->timer.data = conn;
+			ev_timer_start(EV_A_ &conn->timer);
+
+			/* Initialise I/O watcher */
 			ev_io_init(&conn->io, conn_event, fd, EV_READ);
 			conn->io.data = conn;
 			ev_io_start(EV_A_ &conn->io);
@@ -143,6 +167,7 @@ int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, struct nyanttp *restrict 
 	tcp->event_conn_error = nil;
 	tcp->event_conn_readable = nil;
 	tcp->event_conn_writable = nil;
+	tcp->event_conn_timeout = nil;
 
 	struct addrinfo *res;
 
@@ -220,4 +245,11 @@ int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp) {
 
 exit:
 	return ret;
+}
+
+void nyanttp_tcp_conn_touch(struct nyanttp_tcp_conn *restrict conn) {
+	assert(conn);
+
+	/* Reset timeout timer */
+	ev_timer_again(conn->tcp->ctx->loop, &conn->timer);
 }
