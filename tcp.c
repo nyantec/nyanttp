@@ -46,21 +46,33 @@ static int safe_accept(int fd, struct sockaddr *restrict address, socklen_t *res
 static void conn_event(EV_P_ ev_io io, int revents) {
 	struct nyanttp_tcp_conn *conn = (struct nyanttp_tcp_conn *) io.data;
 
-	if (revents & EV_READ) {
-		if (conn->tcp->event_conn_readable)
-			conn->tcp->event_conn_readable(conn);
+	if (unlikely(revents & EV_ERROR)) {
+		struct nyanttp_error error;
+		nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTP_ERROR_EVWATCH);
+		conn->tcp->event_conn_error(conn, &error);
 	}
+	else {
+		if (revents & EV_READ) {
+			if (conn->tcp->event_conn_readable)
+				conn->tcp->event_conn_readable(conn);
+		}
 
-	if (revents & EV_WRITE) {
-		if (conn->tcp->event_conn_writable)
-			conn->tcp->event_conn_writable(conn);
+		if (revents & EV_WRITE) {
+			if (conn->tcp->event_conn_writable)
+				conn->tcp->event_conn_writable(conn);
+		}
 	}
 }
 
 static void listen_event(EV_P_ ev_io io, int revents) {
 	struct nyanttp_tcp *tcp = (struct nyanttp_tcp *) io.data;
 
-	if (likely(revents & EV_READ)) {
+	if (unlikely(revents & EV_ERROR)) {
+		struct nyanttp_error error;
+		nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTP_ERROR_EVWATCH);
+		tcp->event_tcp_error(tcp, &error);
+	}
+	else if (likely(revents & EV_READ)) {
 		/* Accept up to 256 new connections */
 		for (unsigned iter = 0; iter <= 255; ++iter) {
 			struct sockaddr_in6 address;
