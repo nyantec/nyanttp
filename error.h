@@ -26,7 +26,8 @@ enum nyanttp_error_domain {
 enum nyanttp_error_nyan {
 	NYANTTP_ERROR_VERSION,
 	NYANTTP_ERROR_EVVER,
-	NYANTTP_ERROR_EVINIT
+	NYANTTP_ERROR_EVINIT,
+	NYANTTP_ERROR_EVWATCH
 };
 
 /**

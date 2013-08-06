@@ -19,7 +19,8 @@ static thread_local char error_buf[256];
 static char const *const error_map[] = {
 	[NYANTTP_ERROR_VERSION] = "nyanttp version mismatch",
 	[NYANTTP_ERROR_EVVER] = "libev version mismatch",
-	[NYANTTP_ERROR_EVINIT] = "Failed to initialise libev event loop"
+	[NYANTTP_ERROR_EVINIT] = "Failed to initialise libev event loop",
+	[NYANTTP_ERROR_EVWATCH] = "libev watcher stopped"
 };
 
 char const *nyanttp_error(struct nyanttp_error const *restrict error) {
