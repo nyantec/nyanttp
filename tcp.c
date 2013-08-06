@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <sys/socket.h>
@@ -42,6 +43,18 @@ static int safe_accept(int fd, struct sockaddr *restrict address, socklen_t *res
 	return ret;
 }
 
+static void conn_event(EV_P_ ev_io io, int revents) {
+	struct nyanttp_tcp_conn *conn = (struct nyanttp_tcp_conn *) io.data;
+
+	if (revents & EV_READ) {
+		conn->tcp->event_readable(conn);
+	}
+
+	if (revents & EV_WRITE) {
+		conn->tcp->event_writable(conn);
+	}
+}
+
 static void listen_event(EV_P_ ev_io io, int revents) {
 	struct nyanttp_tcp *tcp = (struct nyanttp_tcp *) io.data;
 
@@ -70,7 +83,16 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 				}
 			}
 
-			/* TODO: Handle connection */
+			/* Allocate memory for connection structure */
+			struct nyanttp_tcp_conn *conn = malloc(sizeof (struct nyanttp_tcp_conn));
+			if (unlikely(!conn)) {
+				/* TODO: Handle error */
+			}
+
+			/* Initialise event watcher */
+			ev_io_init(&conn->io, conn_event, fd, EV_READ);
+			conn->io.data = conn;
+			ev_io_start(EV_A_ &conn->io);
 		}
 	}
 }
