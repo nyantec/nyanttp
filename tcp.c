@@ -22,18 +22,53 @@ static struct addrinfo const hints = {
 	.ai_protocol = IPPROTO_TCP
 };
 
+static int safe_close(int fd) {
+	int ret;
+
+	do {
+		ret = close(fd);
+	} while (ret && errno == EINTR);
+
+	return ret;
+}
+
+static int safe_accept(int fd, struct sockaddr *restrict address, socklen_t *restrict addrlen) {
+	int ret;
+
+	do {
+		ret = accept(fd, address, addrlen);
+	} while (ret < 0 && errno == EINTR);
+
+	return ret;
+}
+
 static void listen_event(EV_P_ ev_io io, int revents) {
+	struct nyanttp_tcp *tcp = (struct nyanttp_tcp *) io.data;
+
 	if (likely(revents | EV_READ)) {
 		/* Accept up to 256 new connections */
 		for (unsigned iter = 0; iter <= 255; ++iter) {
-			int fd;
-			do {
-				fd = accept(io.fd, nil, nil);
-			} while (fd < 0 && errno == EINTR);
+			struct sockaddr_in6 address;
+			socklen_t addrlen = sizeof address;
+
+			/* Accept connection */
+			int fd = safe_accept(io.fd, (struct sockaddr *) &address, &addrlen);
+
+			/* Assume that all addresses are IPv6 */
+			assert(address.sin6_family == AF_INET6);
 
 			/* FIXME: Proper error handling */
 			if (unlikely(fd < 0))
 				break;
+
+			/* Raise connect event */
+			if (tcp->event_connect) {
+				if (unlikely(!tcp->event_connect(tcp, &address))) {
+					/* Reject connection */
+					safe_close(fd);
+					continue;
+				}
+			}
 
 			/* TODO: Handle connection */
 		}
@@ -45,6 +80,10 @@ int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, char const *restrict node
 
 	int _;
 	int ret = 0;
+
+	/* Initialise structure */
+	tcp->data = nil;
+	tcp->event_connect = nil;
 
 	struct addrinfo *res;
 
@@ -65,7 +104,7 @@ int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, char const *restrict node
 		if (likely(!bind(fd, rp->ai_addr, rp->ai_addrlen)))
 			break;
 
-		close(fd);
+		safe_close(fd);
 	}
 
 	if (fd < 0) {
@@ -86,7 +125,8 @@ int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, char const *restrict node
 	assert(_);
 
 	/* Initialise I/O watcher */
-	ev_io_init(&tcp->io, nil, fd, EV_READ);
+	ev_io_init(&tcp->io, listen_event, fd, EV_READ);
+	tcp->io.data = tcp;
 
 exit:
 	if (likely(res))
@@ -101,9 +141,7 @@ void nyanttp_tcp_destroy(struct nyanttp_tcp *restrict tcp) {
 	int _;
 
 	/* Close socket */
-	do {
-		_ = close(tcp->io.fd);
-	} while (_ && errno == EINTR);
+	_ = safe_close(tcp->io.fd);
 
 	assert(_);
 }

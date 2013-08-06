@@ -6,15 +6,25 @@
 extern "C" {
 #endif
 
+#include <netinet/ip6.h>
+
 #include <ev.h>
 
+#include <defy/bool>
+
+#include "error.h"
 #include "nyanttp.h"
+
+struct nyanttp_tcp;
 
 /**
  * \brief TCP listener context
  */
 struct nyanttp_tcp {
+	void *data; /**< User data */
 	struct ev_io io; /**< I/O listener */
+	bool (*event_connect)(struct nyanttp_tcp *restrict, struct sockaddr_in6 *restrict); /**< Connect event handler */
+	/* TODO: Event listeners */
 };
 
 /**
