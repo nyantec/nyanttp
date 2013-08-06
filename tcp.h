@@ -29,6 +29,7 @@ struct nyanttp_tcp {
 	bool (*event_tcp_connect)(struct nyanttp_tcp *restrict, struct sockaddr_in6 const *restrict); /**< Connect event handler */
 
 	void (*event_conn_error)(struct nyanttp_tcp_conn *restrict, struct nyanttp_error const *restrict);
+	void (*event_conn_destroy)(struct nyanttp_tcp_conn *restrict);
 	void (*event_conn_readable)(struct nyanttp_tcp_conn *restrict);
 	void (*event_conn_writable)(struct nyanttp_tcp_conn *restrict);
 	bool (*event_conn_timeout)(struct nyanttp_tcp_conn *restrict);

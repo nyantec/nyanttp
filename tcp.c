@@ -250,6 +250,10 @@ exit:
 void nyanttp_tcp_conn_destroy(struct nyanttp_tcp_conn *restrict conn) {
 	assert(conn);
 
+	/* Call destroy event handler */
+	if (conn->event_conn_destroy)
+		conn->event_conn_destroy(conn);
+
 	/* Stop watchers */
 	ev_io_stop(conn->tcp->ctx->loop, &conn->io);
 	ev_timer_stop(conn->tcp->ctx->loop, &conn->timer);
