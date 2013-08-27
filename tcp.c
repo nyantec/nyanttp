@@ -163,6 +163,9 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 				break;
 			}
 
+			/* Initialise user-data pointer */
+			conn->data = nil;
+
 			/* Initialise timeout watcher */
 			/* FIXME: Hard-coded timeout value */
 			ev_timer_init(&conn->timer, timeout_event, 60.0, 60.0);
