@@ -50,6 +50,17 @@ struct nyanttp_error {
  */
 extern char const *nyanttp_error(struct nyanttp_error const *restrict error) nothrow;
 
+/**
+ * \internal
+ * \brief Set error structure parameters
+ *
+ * \param[out] error Error structure
+ * \param[in] domain Error domain
+ * \param[in] code Error code
+ *
+ * Set error structure parameters, automatically determining file name, function
+ * and line number.
+ */
 #define nyanttp_error_set(error, domain, code) (void) ( \
 	(error)->file = __FILE__, \
 	(error)->func = __func__, \
