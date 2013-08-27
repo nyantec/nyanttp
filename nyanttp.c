@@ -1,3 +1,9 @@
+/**
+ * \file
+ *
+ * \internal
+ */
+
 #include <pthread.h>
 
 #include <assert.h>
@@ -37,6 +43,13 @@ unsigned int nyanttp_version_patch() {
 	return NYANTTP_VERSION_PATCH;
 }
 
+/**
+ * \brief Real context initialisation
+ *
+ * \param ctx Pointer to context structure
+ *
+ * \return Zero on success or non-zero on error
+ */
 int nyanttp_init_(struct nyanttp *restrict ctx) {
 	assert(ctx);
 

@@ -1,3 +1,9 @@
+/**
+ * \file
+ *
+ * \internal
+ */
+
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -14,6 +20,9 @@
 #include "nyanttp.h"
 #include "tcp.h"
 
+/**
+ * \brief Address resolution hints
+ */
 static struct addrinfo const hints = {
 	.ai_flags =
 		AI_PASSIVE |
@@ -23,6 +32,13 @@ static struct addrinfo const hints = {
 	.ai_protocol = IPPROTO_TCP
 };
 
+/**
+ * \brief Close file descriptor, retrying if interrupted
+ *
+ * \param[in] fd File descriptor to close
+ *
+ * \return Zero on success or non-zero on failure
+ */
 static int safe_close(int fd) {
 	int ret;
 
@@ -33,6 +49,15 @@ static int safe_close(int fd) {
 	return ret;
 }
 
+/**
+ * \brief Accept new connection, retrying if interrupted
+ *
+ * \param[in] fd File descriptor of the listening socket
+ * \param[out] address Pointer to a \c sockaddr structure to hold the address of the connecting socket
+ * \param[in,out] addrlen Capacity of the structure given by \p address on input, the actual length of the stored address on output
+ *
+ * \return Non-negative file descriptor of the accepted socket or a negative integer on failure
+ */
 static int safe_accept(int fd, struct sockaddr *restrict address, socklen_t *restrict addrlen) {
 	int ret;
 
