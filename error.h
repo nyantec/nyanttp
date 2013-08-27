@@ -44,7 +44,7 @@ struct nyanttp_error {
 /**
  * \brief Get error message string
  *
- * \param error Error description structure
+ * \param[in] error Error description structure
  *
  * \return Pointer to error description
  */

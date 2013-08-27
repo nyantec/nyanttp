@@ -50,17 +50,17 @@ struct nyanttp_tcp_conn {
 /**
  * \brief Initialise TCP context
  *
- * \param tcp Pointer to TCP listener
- * \param ctx Pointer to context structure
- * \param node Host name or address
- * \param service Service name or port number
+ * \param[out] tcp Pointer to TCP listener
+ * \param[in,out] ctx Pointer to context structure
+ * \param[in] node Host name or address
+ * \param[in] service Service name or port number
  */
 extern int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, struct nyanttp *restrict ctx, char const *restrict node, char const *restrict service);
 
 /**
  * \brief Destroy TCP context
  *
- * \param tcp Pointer to TCP listener
+ * \param[in,out] tcp Pointer to TCP listener
  */
 extern void nyanttp_tcp_destroy(struct nyanttp_tcp *restrict tcp);
 

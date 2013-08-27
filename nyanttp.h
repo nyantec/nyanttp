@@ -66,7 +66,7 @@ extern unsigned int nyanttp_version_patch() nothrow;
 /**
  * \brief Initialise context
  *
- * \param ctx Pointer to context structure
+ * \param[out] ctx Pointer to context structure
  *
  * \return Zero on success or non-zero on error
  */
@@ -82,7 +82,7 @@ extern int nyanttp_init_(struct nyanttp *restrict ctx) nothrow;
 /**
  * \brief Destroy context
  *
- * \param ctx Pointer to context structure
+ * \param[in,out] ctx Pointer to context structure
  */
 extern void nyanttp_destroy(struct nyanttp *restrict ctx) nothrow;
 

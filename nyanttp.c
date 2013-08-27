@@ -46,7 +46,7 @@ unsigned int nyanttp_version_patch() {
 /**
  * \brief Real context initialisation
  *
- * \param ctx Pointer to context structure
+ * \param[out] ctx Pointer to context structure
  *
  * \return Zero on success or non-zero on error
  */
