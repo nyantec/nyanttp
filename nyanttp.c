@@ -33,6 +33,10 @@ unsigned int nyanttp_version_minor() {
 	return NYANTTP_VERSION_MINOR;
 }
 
+unsigned int nyanttp_version_patch() {
+	return NYANTTP_VERSION_PATCH;
+}
+
 int nyanttp_init_(struct nyanttp *restrict ctx) {
 	assert(ctx);
 

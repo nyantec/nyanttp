@@ -30,6 +30,11 @@ extern "C" {
 #define NYANTTP_VERSION_MINOR 0u
 
 /**
+ * \brief Patch version number
+ */
+#define NYANTTP_VERSION_PATCH 0u
+
+/**
  * \brief Context structure
  */
 struct nyanttp {
@@ -50,6 +55,13 @@ extern unsigned int nyanttp_version_major() nothrow;
  * \return Minor version number
  */
 extern unsigned int nyanttp_version_minor() nothrow;
+
+/**
+ * \brief Get patch version number
+ *
+ * \return Patch version number
+ */
+extern unsigned int nyanttp_version_patch() nothrow;
 
 /**
  * \brief Initialise context
