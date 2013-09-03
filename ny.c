@@ -46,12 +46,12 @@ unsigned int ny_version_patch() {
 /**
  * \brief Real context initialisation
  *
- * \param[out] ctx Pointer to context structure
+ * \param[out] ny Pointer to context structure
  *
  * \return Zero on success or non-zero on error
  */
-int ny_init_(struct ny *restrict ctx) {
-	assert(ctx);
+int ny_init_(struct ny *restrict ny) {
+	assert(ny);
 
 	int _;
 	int ret = 0;
@@ -59,15 +59,15 @@ int ny_init_(struct ny *restrict ctx) {
 	/* Check libev version */
 	if (unlikely(ev_version_major() != EV_VERSION_MAJOR
 		|| ev_version_minor() < EV_VERSION_MINOR)) {
-		ny_error_set(&ctx->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVVER);
+		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVVER);
 		ret = -1;
 		goto exit;
 	}
 
 	/* Initialise default loop */
-	ctx->loop = ev_default_loop(EVFLAG_AUTO);
-	if (unlikely(!ctx->loop)) {
-		ny_error_set(&ctx->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVINIT);
+	ny->loop = ev_default_loop(EVFLAG_AUTO);
+	if (unlikely(!ny->loop)) {
+		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVINIT);
 		ret = -1;
 		goto exit;
 	}
@@ -80,9 +80,9 @@ exit:
 	return ret;
 }
 
-void ny_destroy(struct ny *restrict ctx) {
-	assert(ctx);
+void ny_destroy(struct ny *restrict ny) {
+	assert(ny);
 
-	assert(ctx->loop);
-	ctx->loop = nil;
+	assert(ny->loop);
+	ny->loop = nil;
 }

@@ -180,16 +180,16 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 	}
 }
 
-int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ctx, char const *restrict node, char const *restrict service) {
+int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny, char const *restrict node, char const *restrict service) {
 	assert(tcp);
-	assert(ctx);
+	assert(ny);
 
 	int _;
 	int ret = 0;
 
 	/* Initialise structure */
 	tcp->data = nil;
-	tcp->ctx = ctx;
+	tcp->ny = ny;
 	tcp->event_tcp_error = nil;
 	tcp->event_tcp_connect = nil;
 	tcp->event_conn_error = nil;
@@ -269,7 +269,7 @@ int ny_tcp_listen(struct ny_tcp *restrict tcp) {
 		goto exit;
 	}
 
-	ev_io_start(tcp->ctx->loop, &tcp->io);
+	ev_io_start(tcp->ny->loop, &tcp->io);
 
 exit:
 	return ret;
@@ -283,8 +283,8 @@ void ny_tcp_conn_destroy(struct ny_tcp_conn *restrict conn) {
 		conn->event_conn_destroy(conn);
 
 	/* Stop watchers */
-	ev_io_stop(conn->tcp->ctx->loop, &conn->io);
-	ev_timer_stop(conn->tcp->ctx->loop, &conn->timer);
+	ev_io_stop(conn->tcp->ny->loop, &conn->io);
+	ev_timer_stop(conn->tcp->ny->loop, &conn->timer);
 
 	/* Close socket */
 	safe_close(conn->io.fd);
@@ -297,5 +297,5 @@ void ny_tcp_conn_touch(struct ny_tcp_conn *restrict conn) {
 	assert(conn);
 
 	/* Reset timeout timer */
-	ev_timer_again(conn->tcp->ctx->loop, &conn->timer);
+	ev_timer_again(conn->tcp->ny->loop, &conn->timer);
 }

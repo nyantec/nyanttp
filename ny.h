@@ -66,25 +66,25 @@ extern unsigned int ny_version_patch() nothrow;
 /**
  * \brief Initialise context
  *
- * \param[out] ctx Pointer to context structure
+ * \param[out] ny Pointer to context structure
  *
  * \return Zero on success or non-zero on error
  */
-#define ny_init(ctx) ( \
+#define ny_init(ny) ( \
 	(ny_version_major() == NY_VERSION_MAJOR \
 		&& ny_version_minor() >= NY_VERSION_MINOR) \
-		? ny_init_(ctx) \
-		: ny_error_set(&(ctx)->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_VERSION), -1 \
+		? ny_init_(ny) \
+		: ny_error_set(&(ny)->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_VERSION), -1 \
 )
 
-extern int ny_init_(struct ny *restrict ctx) nothrow;
+extern int ny_init_(struct ny *restrict ny) nothrow;
 
 /**
  * \brief Destroy context
  *
- * \param[in,out] ctx Pointer to context structure
+ * \param[in,out] ny Pointer to context structure
  */
-extern void ny_destroy(struct ny *restrict ctx) nothrow;
+extern void ny_destroy(struct ny *restrict ny) nothrow;
 
 #if defined __cplusplus
 }

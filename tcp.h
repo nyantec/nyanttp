@@ -23,7 +23,7 @@ struct ny_tcp_conn;
  */
 struct ny_tcp {
 	void *data; /**< User data */
-	struct ny *ctx; /**< Context structure */
+	struct ny *ny; /**< Context structure */
 	struct ev_io io; /**< I/O watcher */
 	void (*event_tcp_error)(struct ny_tcp *restrict, struct ny_error const *restrict);
 	bool (*event_tcp_connect)(struct ny_tcp *restrict, struct sockaddr_in6 const *restrict); /**< Connect event handler */
@@ -51,11 +51,11 @@ struct ny_tcp_conn {
  * \brief Initialise TCP context
  *
  * \param[out] tcp Pointer to TCP listener
- * \param[in,out] ctx Pointer to context structure
+ * \param[in,out] ny Pointer to context structure
  * \param[in] node Host name or address
  * \param[in] service Service name or port number
  */
-extern int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ctx, char const *restrict node, char const *restrict service);
+extern int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny, char const *restrict node, char const *restrict service);
 
 /**
  * \brief Destroy TCP context
