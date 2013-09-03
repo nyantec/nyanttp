@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __nyanttp_tcp__
-#define __nyanttp_tcp__
+#ifndef __ny_tcp__
+#define __ny_tcp__
 
 #if defined __cplusplus
 extern "C" {
@@ -13,34 +13,34 @@ extern "C" {
 #include <defy/bool>
 
 #include "error.h"
-#include "nyanttp.h"
+#include "ny.h"
 
-struct nyanttp_tcp;
-struct nyanttp_tcp_conn;
+struct ny_tcp;
+struct ny_tcp_conn;
 
 /**
  * \brief TCP listener context
  */
-struct nyanttp_tcp {
+struct ny_tcp {
 	void *data; /**< User data */
-	struct nyanttp *ctx; /**< Context structure */
+	struct ny *ctx; /**< Context structure */
 	struct ev_io io; /**< I/O watcher */
-	void (*event_tcp_error)(struct nyanttp_tcp *restrict, struct nyanttp_error const *restrict);
-	bool (*event_tcp_connect)(struct nyanttp_tcp *restrict, struct sockaddr_in6 const *restrict); /**< Connect event handler */
+	void (*event_tcp_error)(struct ny_tcp *restrict, struct ny_error const *restrict);
+	bool (*event_tcp_connect)(struct ny_tcp *restrict, struct sockaddr_in6 const *restrict); /**< Connect event handler */
 
-	void (*event_conn_error)(struct nyanttp_tcp_conn *restrict, struct nyanttp_error const *restrict);
-	void (*event_conn_destroy)(struct nyanttp_tcp_conn *restrict);
-	void (*event_conn_readable)(struct nyanttp_tcp_conn *restrict);
-	void (*event_conn_writable)(struct nyanttp_tcp_conn *restrict);
-	bool (*event_conn_timeout)(struct nyanttp_tcp_conn *restrict);
+	void (*event_conn_error)(struct ny_tcp_conn *restrict, struct ny_error const *restrict);
+	void (*event_conn_destroy)(struct ny_tcp_conn *restrict);
+	void (*event_conn_readable)(struct ny_tcp_conn *restrict);
+	void (*event_conn_writable)(struct ny_tcp_conn *restrict);
+	bool (*event_conn_timeout)(struct ny_tcp_conn *restrict);
 };
 
 /**
  * \brief TCP connection context
  */
-struct nyanttp_tcp_conn {
+struct ny_tcp_conn {
 	void *data; /**< User data */
-	struct nyanttp_tcp *tcp; /**< TCP listener */
+	struct ny_tcp *tcp; /**< TCP listener */
 	struct ev_timer timer; /**< Timeout watcher */
 	struct ev_io io; /**< I/O watcher */
 };
@@ -55,20 +55,20 @@ struct nyanttp_tcp_conn {
  * \param[in] node Host name or address
  * \param[in] service Service name or port number
  */
-extern int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, struct nyanttp *restrict ctx, char const *restrict node, char const *restrict service);
+extern int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ctx, char const *restrict node, char const *restrict service);
 
 /**
  * \brief Destroy TCP context
  *
  * \param[in,out] tcp Pointer to TCP listener
  */
-extern void nyanttp_tcp_destroy(struct nyanttp_tcp *restrict tcp);
+extern void ny_tcp_destroy(struct ny_tcp *restrict tcp);
 
-extern int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp);
+extern int ny_tcp_listen(struct ny_tcp *restrict tcp);
 
-extern void nyanttp_tcp_conn_destroy(struct nyanttp_tcp_conn *restrict conn);
+extern void ny_tcp_conn_destroy(struct ny_tcp_conn *restrict conn);
 
-extern void nyanttp_tcp_conn_touch(struct nyanttp_tcp_conn *restrict conn);
+extern void ny_tcp_conn_touch(struct ny_tcp_conn *restrict conn);
 
 #if defined __cplusplus
 }

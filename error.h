@@ -5,8 +5,8 @@
  */
 
 #pragma once
-#ifndef __nyanttp_error__
-#define __nyanttp_error__
+#ifndef __ny_error__
+#define __ny_error__
 
 #if defined __cplusplus
 extern "C" {
@@ -17,27 +17,27 @@ extern "C" {
 /**
  * \brief Error domain
  */
-enum nyanttp_error_domain {
-	NYANTTP_ERROR_DOMAIN_NYAN, /**< nyanttp internal error */
-	NYANTTP_ERROR_DOMAIN_ERRNO, /**< Error code as defined in errno.h */
-	NYANTTP_ERROR_DOMAIN_GAI /**< getaddrinfo() error */
+enum ny_error_domain {
+	NY_ERROR_DOMAIN_NYAN, /**< ny internal error */
+	NY_ERROR_DOMAIN_ERRNO, /**< Error code as defined in errno.h */
+	NY_ERROR_DOMAIN_GAI /**< getaddrinfo() error */
 };
 
-enum nyanttp_error_nyan {
-	NYANTTP_ERROR_VERSION,
-	NYANTTP_ERROR_EVVER,
-	NYANTTP_ERROR_EVINIT,
-	NYANTTP_ERROR_EVWATCH
+enum ny_error_nyan {
+	NY_ERROR_VERSION,
+	NY_ERROR_EVVER,
+	NY_ERROR_EVINIT,
+	NY_ERROR_EVWATCH
 };
 
 /**
  * \brief Error structure
  */
-struct nyanttp_error {
+struct ny_error {
 	char const *file; /**< File name */
 	char const *func; /**< Function name */
 	unsigned int line; /**< Line number */
-	enum nyanttp_error_domain domain; /**< Error domain */
+	enum ny_error_domain domain; /**< Error domain */
 	int code; /**< Error code */
 };
 
@@ -48,7 +48,7 @@ struct nyanttp_error {
  *
  * \return Pointer to error description
  */
-extern char const *nyanttp_error(struct nyanttp_error const *restrict error) nothrow;
+extern char const *ny_error(struct ny_error const *restrict error) nothrow;
 
 /**
  * \internal
@@ -61,7 +61,7 @@ extern char const *nyanttp_error(struct nyanttp_error const *restrict error) not
  * Set error structure parameters, automatically determining file name, function
  * and line number.
  */
-#define nyanttp_error_set(error, domain, code) (void) ( \
+#define ny_error_set(error, domain, code) (void) ( \
 	(error)->file = __FILE__, \
 	(error)->func = __func__, \
 	(error)->line = __LINE__, \

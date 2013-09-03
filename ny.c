@@ -15,7 +15,7 @@
 
 #include <ev.h>
 
-#include "nyanttp.h"
+#include "ny.h"
 
 static pthread_once_t once = PTHREAD_ONCE_INIT;
 
@@ -31,16 +31,16 @@ static void setup_once() {
 	assert(!_);
 }
 
-unsigned int nyanttp_version_major() {
-	return NYANTTP_VERSION_MAJOR;
+unsigned int ny_version_major() {
+	return NY_VERSION_MAJOR;
 }
 
-unsigned int nyanttp_version_minor() {
-	return NYANTTP_VERSION_MINOR;
+unsigned int ny_version_minor() {
+	return NY_VERSION_MINOR;
 }
 
-unsigned int nyanttp_version_patch() {
-	return NYANTTP_VERSION_PATCH;
+unsigned int ny_version_patch() {
+	return NY_VERSION_PATCH;
 }
 
 /**
@@ -50,7 +50,7 @@ unsigned int nyanttp_version_patch() {
  *
  * \return Zero on success or non-zero on error
  */
-int nyanttp_init_(struct nyanttp *restrict ctx) {
+int ny_init_(struct ny *restrict ctx) {
 	assert(ctx);
 
 	int _;
@@ -59,7 +59,7 @@ int nyanttp_init_(struct nyanttp *restrict ctx) {
 	/* Check libev version */
 	if (unlikely(ev_version_major() != EV_VERSION_MAJOR
 		|| ev_version_minor() < EV_VERSION_MINOR)) {
-		nyanttp_error_set(&ctx->error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_EVVER);
+		ny_error_set(&ctx->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVVER);
 		ret = -1;
 		goto exit;
 	}
@@ -67,7 +67,7 @@ int nyanttp_init_(struct nyanttp *restrict ctx) {
 	/* Initialise default loop */
 	ctx->loop = ev_default_loop(EVFLAG_AUTO);
 	if (unlikely(!ctx->loop)) {
-		nyanttp_error_set(&ctx->error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_EVINIT);
+		ny_error_set(&ctx->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVINIT);
 		ret = -1;
 		goto exit;
 	}
@@ -80,7 +80,7 @@ exit:
 	return ret;
 }
 
-void nyanttp_destroy(struct nyanttp *restrict ctx) {
+void ny_destroy(struct ny *restrict ctx) {
 	assert(ctx);
 
 	assert(ctx->loop);

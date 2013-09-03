@@ -5,8 +5,8 @@
  */
 
 #pragma once
-#ifndef __nyanttp_alloc__
-#define __nyanttp_alloc__
+#ifndef __ny_alloc__
+#define __ny_alloc__
 
 #if defined __cplusplus
 extern "C" {
@@ -19,7 +19,7 @@ extern "C" {
 /**
  * \brief Allocation pool
  */
-struct nyanttp_alloc {
+struct ny_alloc {
 	void *pool; /**< Memory pool */
 	uint32_t free; /**< Index of first free object */
 	uint16_t size; /**< Object size */
@@ -34,14 +34,14 @@ struct nyanttp_alloc {
  *
  * \return Zero on success or non-zero on error
  */
-extern int nyanttp_alloc_init(struct nyanttp_alloc *restrict alloc, uint32_t number, uint16_t size);
+extern int ny_alloc_init(struct ny_alloc *restrict alloc, uint32_t number, uint16_t size);
 
 /**
  * \brief Destroy allocation pool
  *
  * \param[in,out] alloc Allocation pool
  */
-extern void nyanttp_alloc_destroy(struct nyanttp_alloc *restrict alloc);
+extern void ny_alloc_destroy(struct ny_alloc *restrict alloc);
 
 /**
  * \brief Acquire object from pool
@@ -50,7 +50,7 @@ extern void nyanttp_alloc_destroy(struct nyanttp_alloc *restrict alloc);
  *
  * \return Pointer to allocated object or null on error
  */
-extern void *nyanttp_alloc_acquire(struct nyanttp_alloc *restrict alloc);
+extern void *ny_alloc_acquire(struct ny_alloc *restrict alloc);
 
 /**
  * \brief Release object back into pool
@@ -58,7 +58,7 @@ extern void *nyanttp_alloc_acquire(struct nyanttp_alloc *restrict alloc);
  * \param[in,out] alloc Allocation pool
  * \param[in] object Object
  */
-extern void nyanttp_alloc_release(struct nyanttp_alloc *restrict alloc, void *restrict object);
+extern void ny_alloc_release(struct ny_alloc *restrict alloc, void *restrict object);
 
 #if defined __cplusplus
 }

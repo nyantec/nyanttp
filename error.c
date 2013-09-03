@@ -23,17 +23,17 @@ static thread_local char error_buf[256];
  * \brief Error message map
  */
 static char const *const error_map[] = {
-	[NYANTTP_ERROR_VERSION] = "nyanttp version mismatch",
-	[NYANTTP_ERROR_EVVER] = "libev version mismatch",
-	[NYANTTP_ERROR_EVINIT] = "Failed to initialise libev event loop",
-	[NYANTTP_ERROR_EVWATCH] = "libev watcher stopped"
+	[NY_ERROR_VERSION] = "ny version mismatch",
+	[NY_ERROR_EVVER] = "libev version mismatch",
+	[NY_ERROR_EVINIT] = "Failed to initialise libev event loop",
+	[NY_ERROR_EVWATCH] = "libev watcher stopped"
 };
 
-char const *nyanttp_error(struct nyanttp_error const *restrict error) {
+char const *ny_error(struct ny_error const *restrict error) {
 	char const *string = "Unknown error";
 
 	switch (error->domain) {
-	case NYANTTP_ERROR_DOMAIN_NYAN:
+	case NY_ERROR_DOMAIN_NY:
 		/* Check if error code inside bounds */
 		if (unlikely(error->code >= sizeof error_map / sizeof *error_map))
 			break;
@@ -45,14 +45,14 @@ char const *nyanttp_error(struct nyanttp_error const *restrict error) {
 		string = error_map[error->code];
 		break;
 
-	case NYANTTP_ERROR_DOMAIN_ERRNO:
+	case NY_ERROR_DOMAIN_ERRNO:
 		if (unlikely(strerror_r(error->code, error_buf, sizeof error_buf)))
 			break;
 
 		string = error_buf;
 		break;
 
-	case NYANTTP_ERROR_DOMAIN_GAI:
+	case NY_ERROR_DOMAIN_GAI:
 		string = gai_strerror(error->code);
 		break;
 	}

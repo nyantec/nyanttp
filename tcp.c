@@ -17,7 +17,7 @@
 #include <defy/nil>
 #include <defy/restrict>
 
-#include "nyanttp.h"
+#include "ny.h"
 #include "tcp.h"
 
 /**
@@ -69,11 +69,11 @@ static int safe_accept(int fd, struct sockaddr *restrict address, socklen_t *res
 }
 
 static void conn_event(EV_P_ ev_io io, int revents) {
-	struct nyanttp_tcp_conn *conn = (struct nyanttp_tcp_conn *) io.data;
+	struct ny_tcp_conn *conn = (struct ny_tcp_conn *) io.data;
 
 	if (unlikely(revents & EV_ERROR)) {
-		struct nyanttp_error error;
-		nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_EVWATCH);
+		struct ny_error error;
+		ny_error_set(&error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVWATCH);
 		conn->tcp->event_conn_error(conn, &error);
 	}
 	else {
@@ -90,11 +90,11 @@ static void conn_event(EV_P_ ev_io io, int revents) {
 }
 
 static void timeout_event(EV_P_ ev_timer timer, int revents) {
-	struct nyanttp_tcp_conn *conn = (struct nyanttp_tcp_conn *) timer.data;
+	struct ny_tcp_conn *conn = (struct ny_tcp_conn *) timer.data;
 
 	if (unlikely(revents & EV_ERROR)) {
-		struct nyanttp_error error;
-		nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_EVWATCH);
+		struct ny_error error;
+		ny_error_set(&error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVWATCH);
 		conn->tcp->event_conn_error(conn, &error);
 	}
 	else if (likely(revents & EV_TIMEOUT)) {
@@ -103,16 +103,16 @@ static void timeout_event(EV_P_ ev_timer timer, int revents) {
 			if (unlikely(conn->tcp->event_conn_timeout(conn)))
 				return;
 
-		nyanttp_tcp_conn_destroy(conn);
+		ny_tcp_conn_destroy(conn);
 	}
 }
 
 static void listen_event(EV_P_ ev_io io, int revents) {
-	struct nyanttp_tcp *tcp = (struct nyanttp_tcp *) io.data;
+	struct ny_tcp *tcp = (struct ny_tcp *) io.data;
 
 	if (unlikely(revents & EV_ERROR)) {
-		struct nyanttp_error error;
-		nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_EVWATCH);
+		struct ny_error error;
+		ny_error_set(&error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVWATCH);
 		tcp->event_tcp_error(tcp, &error);
 	}
 	else if (likely(revents & EV_READ)) {
@@ -131,8 +131,8 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			if (unlikely(fd < 0)) {
 				if (unlikely(errno != EAGAIN && errno != EWOULDBLOCK)) {
 					if (tcp->event_tcp_error) {
-						struct nyanttp_error error;
-						nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_ERRNO, errno);
+						struct ny_error error;
+						ny_error_set(&error, NY_ERROR_DOMAIN_ERRNO, errno);
 						tcp->event_tcp_error(tcp, &error);
 					}
 				}
@@ -150,11 +150,11 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			}
 
 			/* Allocate memory for connection structure */
-			struct nyanttp_tcp_conn *conn = malloc(sizeof (struct nyanttp_tcp_conn));
+			struct ny_tcp_conn *conn = malloc(sizeof (struct ny_tcp_conn));
 			if (unlikely(!conn)) {
 				if (tcp->event_tcp_error) {
-					struct nyanttp_error error;
-					nyanttp_error_set(&error, NYANTTP_ERROR_DOMAIN_ERRNO, errno);
+					struct ny_error error;
+					ny_error_set(&error, NY_ERROR_DOMAIN_ERRNO, errno);
 					tcp->event_tcp_error(tcp, &error);
 				}
 
@@ -180,7 +180,7 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 	}
 }
 
-int nyanttp_tcp_init(struct nyanttp_tcp *restrict tcp, struct nyanttp *restrict ctx, char const *restrict node, char const *restrict service) {
+int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ctx, char const *restrict node, char const *restrict service) {
 	assert(tcp);
 	assert(ctx);
 
@@ -247,7 +247,7 @@ exit:
 	return ret;
 }
 
-void nyanttp_tcp_destroy(struct nyanttp_tcp *restrict tcp) {
+void ny_tcp_destroy(struct ny_tcp *restrict tcp) {
 	assert(tcp);
 
 	int _;
@@ -258,7 +258,7 @@ void nyanttp_tcp_destroy(struct nyanttp_tcp *restrict tcp) {
 	assert(_);
 }
 
-int nyanttp_tcp_listen(struct nyanttp_tcp *restrict tcp) {
+int ny_tcp_listen(struct ny_tcp *restrict tcp) {
 	assert(tcp);
 
 	int ret = 0;
@@ -275,7 +275,7 @@ exit:
 	return ret;
 }
 
-void nyanttp_tcp_conn_destroy(struct nyanttp_tcp_conn *restrict conn) {
+void ny_tcp_conn_destroy(struct ny_tcp_conn *restrict conn) {
 	assert(conn);
 
 	/* Call destroy event handler */
@@ -293,7 +293,7 @@ void nyanttp_tcp_conn_destroy(struct nyanttp_tcp_conn *restrict conn) {
 	free(conn);
 }
 
-void nyanttp_tcp_conn_touch(struct nyanttp_tcp_conn *restrict conn) {
+void ny_tcp_conn_touch(struct ny_tcp_conn *restrict conn) {
 	assert(conn);
 
 	/* Reset timeout timer */

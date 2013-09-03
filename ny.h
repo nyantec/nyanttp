@@ -5,8 +5,8 @@
  */
 
 #pragma once
-#ifndef __nyanttp__
-#define __nyanttp__
+#ifndef __ny__
+#define __ny__
 
 #if defined __cplusplus
 extern "C" {
@@ -22,24 +22,24 @@ extern "C" {
 /**
  * \brief Major version number
  */
-#define NYANTTP_VERSION_MAJOR 0u
+#define NY_VERSION_MAJOR 0u
 
 /**
  * \brief Minor version number
  */
-#define NYANTTP_VERSION_MINOR 0u
+#define NY_VERSION_MINOR 0u
 
 /**
  * \brief Patch version number
  */
-#define NYANTTP_VERSION_PATCH 0u
+#define NY_VERSION_PATCH 0u
 
 /**
  * \brief Context structure
  */
-struct nyanttp {
+struct ny {
 	struct ev_loop *loop; /**< Event loop */
-	struct nyanttp_error error; /**< Last error */
+	struct ny_error error; /**< Last error */
 };
 
 /**
@@ -47,21 +47,21 @@ struct nyanttp {
  *
  * \return Major version number
  */
-extern unsigned int nyanttp_version_major() nothrow;
+extern unsigned int ny_version_major() nothrow;
 
 /**
  * \brief Get minor version number
  *
  * \return Minor version number
  */
-extern unsigned int nyanttp_version_minor() nothrow;
+extern unsigned int ny_version_minor() nothrow;
 
 /**
  * \brief Get patch version number
  *
  * \return Patch version number
  */
-extern unsigned int nyanttp_version_patch() nothrow;
+extern unsigned int ny_version_patch() nothrow;
 
 /**
  * \brief Initialise context
@@ -70,21 +70,21 @@ extern unsigned int nyanttp_version_patch() nothrow;
  *
  * \return Zero on success or non-zero on error
  */
-#define nyanttp_init(ctx) ( \
-	(nyanttp_version_major() == NYANTTP_VERSION_MAJOR \
-		&& nyanttp_version_minor() >= NYANTTP_VERSION_MINOR) \
-		? nyanttp_init_(ctx) \
-		: nyanttp_error_set(&(ctx)->error, NYANTTP_ERROR_DOMAIN_NYAN, NYANTTP_ERROR_VERSION), -1 \
+#define ny_init(ctx) ( \
+	(ny_version_major() == NY_VERSION_MAJOR \
+		&& ny_version_minor() >= NY_VERSION_MINOR) \
+		? ny_init_(ctx) \
+		: ny_error_set(&(ctx)->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_VERSION), -1 \
 )
 
-extern int nyanttp_init_(struct nyanttp *restrict ctx) nothrow;
+extern int ny_init_(struct ny *restrict ctx) nothrow;
 
 /**
  * \brief Destroy context
  *
  * \param[in,out] ctx Pointer to context structure
  */
-extern void nyanttp_destroy(struct nyanttp *restrict ctx) nothrow;
+extern void ny_destroy(struct ny *restrict ctx) nothrow;
 
 #if defined __cplusplus
 }
