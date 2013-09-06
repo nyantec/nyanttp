@@ -73,7 +73,7 @@ static void conn_event(EV_P_ ev_io io, int revents) {
 
 	if (unlikely(revents & EV_ERROR)) {
 		struct ny_error error;
-		ny_error_set(&error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVWATCH);
+		ny_error_set(&error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVWATCH);
 		conn->tcp->event_conn_error(conn, &error);
 	}
 	else {
@@ -94,7 +94,7 @@ static void timeout_event(EV_P_ ev_timer timer, int revents) {
 
 	if (unlikely(revents & EV_ERROR)) {
 		struct ny_error error;
-		ny_error_set(&error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVWATCH);
+		ny_error_set(&error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVWATCH);
 		conn->tcp->event_conn_error(conn, &error);
 	}
 	else if (likely(revents & EV_TIMEOUT)) {
@@ -112,7 +112,7 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 
 	if (unlikely(revents & EV_ERROR)) {
 		struct ny_error error;
-		ny_error_set(&error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVWATCH);
+		ny_error_set(&error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVWATCH);
 		tcp->event_tcp_error(tcp, &error);
 	}
 	else if (likely(revents & EV_READ)) {
@@ -279,8 +279,8 @@ void ny_tcp_conn_destroy(struct ny_tcp_conn *restrict conn) {
 	assert(conn);
 
 	/* Call destroy event handler */
-	if (conn->event_conn_destroy)
-		conn->event_conn_destroy(conn);
+	if (conn->tcp->event_conn_destroy)
+		conn->tcp->event_conn_destroy(conn);
 
 	/* Stop watchers */
 	ev_io_stop(conn->tcp->ny->loop, &conn->io);
