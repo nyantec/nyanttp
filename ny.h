@@ -76,7 +76,7 @@ extern unsigned int ny_version_patch() nothrow defy_const;
 	(ny_version_major() == NY_VERSION_MAJOR \
 		&& ny_version_minor() >= NY_VERSION_MINOR) \
 		? ny_init_(ny) \
-		: ny_error_set(&(ny)->error, NY_ERROR_DOMAIN_NY, NY_ERROR_VERSION), -1 \
+		: (ny_error_set(&(ny)->error, NY_ERROR_DOMAIN_NY, NY_ERROR_VERSION), -1) \
 )
 
 extern int ny_init_(struct ny *restrict ny) nothrow;
