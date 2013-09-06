@@ -1,4 +1,5 @@
-CPPFLAGS ?= -D_FORTIFY_SOURCE=2 -pedantic -Wall -Wstrict-overflow=5
+CPPFLAGS ?= -D_FORTIFY_SOURCE=2 -pedantic -Wall -Wstrict-overflow=5 \
+-Wsuggest-attribute=pure -Wsuggest-attribute=const -Wsuggest-attribute=noreturn
 CFLAGS   ?= -pipe -O2 -fstack-protector
 PREFIX   ?= usr/local
 
