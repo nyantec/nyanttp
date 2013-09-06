@@ -23,7 +23,6 @@ struct ny_alloc {
 	uint8_t *raw; /**< Memory mapping */
 	uint8_t *pool; /**< Object pool */
 	size_t alloc; /**< Size of memory allocation */
-	uint32_t remain; /**< Remaining number of objects objects */
 	uint32_t free; /**< Index of first free object */
 	uint16_t size; /**< Object size */
 };

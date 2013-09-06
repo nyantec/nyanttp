@@ -73,7 +73,7 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 		+ 2 * ny->page_size;
 
 	/* Adjust object number to fill up last page */
-	alloc->remain = alloc->alloc / alloc->size;
+	size_t actual = alloc->alloc / alloc->size;
 
 	/* Allocate memory for pool */
 	alloc->raw = mmap(nil, alloc->alloc, PROT_READ | PROT_WRITE,
@@ -102,8 +102,11 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 
 	/* Initialise free list */
 	alloc->free = 0;
-	for (uint_least32_t iter = 0; iter <= alloc->remain; ++iter)
+	for (uint_least32_t iter = 0; iter < actual - 1; ++iter)
 		*(uint32_t *) index(alloc, iter) = iter + 1;
+
+	/* Sentinel */
+	*(uint32_t *) index(alloc, actual - 1) = UINT32_MAX;
 
 	status = 0;
 	goto exit;
@@ -138,11 +141,10 @@ void *ny_alloc_acquire(struct ny_alloc *restrict alloc) {
 	void *object = nil;
 
 	/* Any objects remaining? */
-	if (likely(alloc->remain)) {
+	if (likely(alloc->free != UINT32_MAX)) {
 		/* Pop object from list */
 		object = index(alloc, alloc->free);
 		alloc->free = *(uint32_t *) object;
-		--alloc->remain;
 	}
 
 	return object;
@@ -155,5 +157,4 @@ void ny_alloc_release(struct ny_alloc *restrict alloc, void *restrict object) {
 	/* Push object back onto list */
 	*(uint32_t *) object = alloc->free;
 	alloc->free = pointer(alloc, object);
-	++alloc->remain;
 }
