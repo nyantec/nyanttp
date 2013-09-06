@@ -154,6 +154,14 @@ void ny_alloc_release(struct ny_alloc *restrict alloc, void *restrict object) {
 	assert(alloc);
 	assert(object);
 
+#ifdef NY_DEBUG_ALLOC
+	/* Attempt to discover double-free situations */
+	for (uint_least32_t iter = alloc->free; iter != UINT32_MAX;
+		iter = *(uint32_t *) index(alloc, iter)) {
+		assert(pointer(alloc, object) != iter);
+	}
+#endif
+
 	/* Push object back onto list */
 	*(uint32_t *) object = alloc->free;
 	alloc->free = pointer(alloc, object);
