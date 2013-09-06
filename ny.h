@@ -14,6 +14,7 @@ extern "C" {
 
 #include <ev.h>
 
+#include <defy/const>
 #include <defy/nothrow>
 #include <defy/restrict>
 
@@ -48,21 +49,21 @@ struct ny {
  *
  * \return Major version number
  */
-extern unsigned int ny_version_major() nothrow;
+extern unsigned int ny_version_major() nothrow defy_const;
 
 /**
  * \brief Get minor version number
  *
  * \return Minor version number
  */
-extern unsigned int ny_version_minor() nothrow;
+extern unsigned int ny_version_minor() nothrow defy_const;
 
 /**
  * \brief Get patch version number
  *
  * \return Patch version number
  */
-extern unsigned int ny_version_patch() nothrow;
+extern unsigned int ny_version_patch() nothrow defy_const;
 
 /**
  * \brief Initialise context

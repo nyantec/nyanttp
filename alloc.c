@@ -9,21 +9,23 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
+#include <defy/const>
 #include <defy/expect>
 #include <defy/nil>
+#include <defy/pure>
 
 #include "ny.h"
 #include "alloc.h"
 
-static size_t align(size_t size, size_t alignment) {
+static defy_const size_t align(size_t size, size_t alignment) {
 	return (size + alignment - (size_t) 1) & ~(alignment - (size_t) 1);
 }
 
-static size_t max(size_t a, size_t b) {
+static defy_const size_t max(size_t a, size_t b) {
 	return a > b ? a : b;
 }
 
-static void *index(struct ny_alloc const *restrict alloc, uint32_t idx) {
+static defy_pure void *index(struct ny_alloc const *restrict alloc, uint32_t idx) {
 	/* Calculate octet offset */
 	size_t offset = alloc->size * idx;
 
@@ -33,7 +35,7 @@ static void *index(struct ny_alloc const *restrict alloc, uint32_t idx) {
 	return alloc->pool + offset;
 }
 
-static uint32_t pointer(struct ny_alloc const *restrict alloc, void *ptr) {
+static defy_pure uint32_t pointer(struct ny_alloc const *restrict alloc, void *ptr) {
 	/* Lower bound */
 	assert(((uintptr_t) ptr) >= ((uintptr_t) alloc->pool));
 
