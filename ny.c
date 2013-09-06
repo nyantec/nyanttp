@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <unistd.h>
 
 #include <defy/expect>
 #include <defy/nil>
@@ -59,15 +60,25 @@ int ny_init_(struct ny *restrict ny) {
 	/* Check libev version */
 	if (unlikely(ev_version_major() != EV_VERSION_MAJOR
 		|| ev_version_minor() < EV_VERSION_MINOR)) {
-		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVVER);
+		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVVER);
 		ret = -1;
 		goto exit;
 	}
 
+	/* Determine system page size */
+	int page_size = sysconf(_SC_PAGE_SIZE);
+	if (unlikely(page_size < 0)) {
+		ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+		ret = -1;
+		goto exit;
+	}
+
+	ny->page_size = page_size;
+
 	/* Initialise default loop */
 	ny->loop = ev_default_loop(EVFLAG_AUTO);
 	if (unlikely(!ny->loop)) {
-		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_EVINIT);
+		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVINIT);
 		ret = -1;
 		goto exit;
 	}

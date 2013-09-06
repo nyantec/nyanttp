@@ -40,6 +40,7 @@ extern "C" {
 struct ny {
 	struct ev_loop *loop; /**< Event loop */
 	struct ny_error error; /**< Last error */
+	size_t page_size; /**< System page size */
 };
 
 /**
@@ -74,7 +75,7 @@ extern unsigned int ny_version_patch() nothrow;
 	(ny_version_major() == NY_VERSION_MAJOR \
 		&& ny_version_minor() >= NY_VERSION_MINOR) \
 		? ny_init_(ny) \
-		: ny_error_set(&(ny)->error, NY_ERROR_DOMAIN_NYAN, NY_ERROR_VERSION), -1 \
+		: ny_error_set(&(ny)->error, NY_ERROR_DOMAIN_NY, NY_ERROR_VERSION), -1 \
 )
 
 extern int ny_init_(struct ny *restrict ny) nothrow;
