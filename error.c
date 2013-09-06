@@ -29,7 +29,7 @@ static char const *const error_map[] = {
 	[NY_ERROR_EVWATCH] = "libev watcher stopped"
 };
 
-char const *ny_error(struct ny_error const *restrict error) {
+char const *ny_error_r(struct ny_error const *restrict error, char *restrict buffer, size_t length) {
 	char const *string = "Unknown error";
 
 	switch (error->domain) {
@@ -46,10 +46,10 @@ char const *ny_error(struct ny_error const *restrict error) {
 		break;
 
 	case NY_ERROR_DOMAIN_ERRNO:
-		if (unlikely(strerror_r(error->code, error_buf, sizeof error_buf)))
+		if (unlikely(strerror_r(error->code, buffer, length)))
 			break;
 
-		string = error_buf;
+		string = buffer;
 		break;
 
 	case NY_ERROR_DOMAIN_GAI:
@@ -58,4 +58,8 @@ char const *ny_error(struct ny_error const *restrict error) {
 	}
 
 	return string;
+}
+
+char const *ny_error(struct ny_error const *restrict error) {
+	return ny_error_r(error, error_buf, sizeof error_buf);
 }
