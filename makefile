@@ -2,10 +2,10 @@ CPPFLAGS ?= -D_FORTIFY_SOURCE=2 -pedantic -Wall
 CFLAGS   ?= -pipe -O2 -fstack-protector
 PREFIX   ?= usr/local
 
-CPPFLAGS += -D_XOPEN_SOURCE=700 -std=c11 -pthread
+CPPFLAGS += -D_XOPEN_SOURCE=700 -D_BSD_SOURCE -std=c11 -pthread
 LDFLAGS  += -lev
 
-libny: libny.a(ny.o) libny.a(tcp.o) libny.a(error.o)
+libny: libny.a(ny.o) libny.a(alloc.o) libny.a(tcp.o) libny.a(error.o)
 
 .c.a:
 	@set -e; \
