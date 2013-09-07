@@ -7,9 +7,4 @@ libny_la_SOURCES = \
 libny_la_CFLAGS = $(AM_CFLAGS) $(libev_CFLAGS)
 libny_la_LDFLAGS = $(AM_LDFLAGS) $(libev_LIBS)
 
-check_PROGRAMS = testny
-testny_SOURCES = test.c
-testny_LDADD = libny.la
-testny_LDFLAGS = $(AM_LDFLAGS) -lcheck
-
-TESTS = $(check_PROGRAMS)
+SUBDIRS = test
