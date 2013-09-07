@@ -48,10 +48,14 @@ char const *ny_error_r(struct ny_error const *restrict error, char *restrict buf
 		break;
 
 	case NY_ERROR_DOMAIN_ERRNO:
+#if STRERROR_R_CHAR_P
+		string = strerror_r(error->code, buffer, length);
+#else
 		if (unlikely(strerror_r(error->code, buffer, length)))
 			break;
 
 		string = buffer;
+#endif
 		break;
 
 	case NY_ERROR_DOMAIN_GAI:
