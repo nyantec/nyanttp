@@ -120,7 +120,7 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 unmap:
 	/* Unmap memory pool */
 	_ = munmap(alloc->pool, alloc->alloc);
-	assert(_);
+	assert(!_);
 
 exit:
 	return status;
@@ -135,7 +135,7 @@ void ny_alloc_destroy(struct ny_alloc *restrict alloc) {
 
 	/* Unmap memory pool */
 	_ = munmap(alloc->raw, alloc->alloc);
-	assert(_);
+	assert(!_);
 
 	alloc->pool = nil;
 	alloc->alloc = 0;
