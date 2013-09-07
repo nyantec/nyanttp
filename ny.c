@@ -4,6 +4,8 @@
  * \internal
  */
 
+#include "config.h"
+
 #include <pthread.h>
 
 #include <assert.h>
