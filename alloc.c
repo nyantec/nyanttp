@@ -70,12 +70,14 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 	/* Minimum size of 4 bytes, aligned to word size */
 	alloc->size = align(max(size, sizeof (uint32_t)), sizeof (void *));
 
+	/* Size of payload without guard pages */
+	size_t payload = align(number * alloc->size, ny->page_size);
+
 	/* Size of memory allocation */
-	alloc->alloc = align(number * alloc->size, ny->page_size)
-		+ 2 * ny->page_size;
+	alloc->alloc = payload + 2 * ny->page_size;
 
 	/* Adjust object number to fill up last page */
-	size_t actual = alloc->alloc / alloc->size;
+	size_t actual = payload / alloc->size;
 
 	/* Allocate memory for pool */
 	alloc->raw = mmap(nil, alloc->alloc, PROT_READ | PROT_WRITE,
