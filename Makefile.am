@@ -7,4 +7,6 @@ libny_la_LDFLAGS = $(AM_LDFLAGS) $(libev_LIBS)
 
 pkginclude_HEADERS = ny.h error.h alloc.h tcp.h
 
+EXTRA_DIST = Licence
+
 SUBDIRS = test
