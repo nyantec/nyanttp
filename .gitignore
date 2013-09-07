@@ -3,5 +3,7 @@
 !.gitignore
 
 # Binaries
+testny
 *.a
 *.o
+*.so
