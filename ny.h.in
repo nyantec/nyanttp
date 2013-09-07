@@ -23,17 +23,17 @@ extern "C" {
 /**
  * \brief Major version number
  */
-#define NY_VERSION_MAJOR 0u
+#define NY_VERSION_MAJOR @AX_MAJOR_VERSION@u
 
 /**
  * \brief Minor version number
  */
-#define NY_VERSION_MINOR 0u
+#define NY_VERSION_MINOR @AX_MINOR_VERSION@u
 
 /**
  * \brief Patch version number
  */
-#define NY_VERSION_PATCH 0u
+#define NY_VERSION_PATCH @AX_POINT_VERSION@u
 
 /**
  * \brief Context structure
