@@ -36,5 +36,7 @@ AX_LIB_EV
 AC_FUNC_MMAP
 AC_FUNC_STRERROR_R
 
+AC_CHECK_FUNCS([posix_madvise])
+
 AC_CONFIG_FILES([Makefile test/Makefile])
 AC_OUTPUT

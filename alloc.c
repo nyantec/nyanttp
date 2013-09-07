@@ -119,6 +119,12 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 	}
 
 	alloc->pool = alloc->raw + ny->page_size;
+
+#	if HAVE_POSIX_MADVISE
+	/* Advise the OS about the access pattern */
+	posix_madvise(alloc->pool, payload,
+		POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
+#	endif
 #else
 	alloc->raw = malloc(alloc->alloc);
 	if (unlikely(!alloc->raw)) {
@@ -127,12 +133,6 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 	}
 
 	alloc->pool = alloc->raw;
-#endif
-
-#if HAVE_MMAP
-	/* Advise the OS about the access pattern */
-	posix_madvise(alloc->pool, payload,
-		POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
 #endif
 
 	/* Initialise free list */
