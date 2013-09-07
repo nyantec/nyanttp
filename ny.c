@@ -42,8 +42,8 @@ unsigned int ny_version_minor() {
 	return NY_VERSION_MINOR;
 }
 
-unsigned int ny_version_patch() {
-	return NY_VERSION_PATCH;
+unsigned int ny_version_micro() {
+	return NY_VERSION_MICRO;
 }
 
 /**

@@ -31,9 +31,9 @@ extern "C" {
 #define NY_VERSION_MINOR @AX_MINOR_VERSION@u
 
 /**
- * \brief Patch version number
+ * \brief Micro version number
  */
-#define NY_VERSION_PATCH @AX_POINT_VERSION@u
+#define NY_VERSION_MICRO @AX_POINT_VERSION@u
 
 /**
  * \brief Context structure
