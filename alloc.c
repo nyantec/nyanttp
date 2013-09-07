@@ -137,6 +137,7 @@ void ny_alloc_destroy(struct ny_alloc *restrict alloc) {
 	_ = munmap(alloc->raw, alloc->alloc);
 	assert(!_);
 
+	alloc->raw = nil;
 	alloc->pool = nil;
 	alloc->alloc = 0;
 }
