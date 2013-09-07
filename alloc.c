@@ -100,8 +100,10 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 		goto unmap;
 	}
 
+	alloc->pool = alloc->raw + ny->page_size;
+
 	/* Advise the OS about the access pattern */
-	posix_madvise(alloc->pool, alloc->alloc - 2 * ny->page_size,
+	posix_madvise(alloc->pool, payload,
 		POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
 
 	/* Initialise free list */
