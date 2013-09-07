@@ -4,10 +4,17 @@
  * \internal
  */
 
+#include "config.h"
+
 #include <assert.h>
 #include <errno.h>
 #include <unistd.h>
-#include <sys/mman.h>
+
+#if HAVE_MMAP
+#	include <sys/mman.h>
+#else
+#	include <stdlib.h>
+#endif
 
 #include <defy/const>
 #include <defy/expect>
@@ -46,7 +53,7 @@ static defy_pure uint32_t pointer(struct ny_alloc const *restrict alloc, void *p
 	assert(offset % alloc->size == 0);
 
 	/* Upper bound */
-	assert(offset + alloc->size < alloc->alloc);
+	assert(offset + alloc->size <= alloc->alloc);
 
 	return offset / alloc->size;
 }
@@ -71,15 +78,26 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 	alloc->size = align(max(size, sizeof (uint32_t)), sizeof (void *));
 
 	/* Size of payload without guard pages */
-	size_t payload = align(number * alloc->size, ny->page_size);
+	size_t payload =
+#if HAVE_MMAP
+		align(number * alloc->size, ny->page_size);
+#else
+		number * alloc->size;
+#endif
 
 	/* Size of memory allocation */
-	alloc->alloc = payload + 2 * ny->page_size;
+	alloc->alloc =
+#if HAVE_MMAP
+		payload + 2 * ny->page_size;
+#else
+		payload;
+#endif
 
 	/* Adjust object number to fill up last page */
 	size_t actual = payload / alloc->size;
 
 	/* Allocate memory for pool */
+#if HAVE_MMAP
 	alloc->raw = mmap(nil, alloc->alloc, PROT_READ | PROT_WRITE,
 		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (unlikely(alloc->raw == MAP_FAILED)) {
@@ -101,10 +119,21 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 	}
 
 	alloc->pool = alloc->raw + ny->page_size;
+#else
+	alloc->raw = malloc(alloc->alloc);
+	if (unlikely(!alloc->raw)) {
+		ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+		goto exit;
+	}
 
+	alloc->pool = alloc->raw;
+#endif
+
+#if HAVE_MMAP
 	/* Advise the OS about the access pattern */
 	posix_madvise(alloc->pool, payload,
 		POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
+#endif
 
 	/* Initialise free list */
 	alloc->free = 0;
@@ -119,8 +148,12 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 
 unmap:
 	/* Unmap memory pool */
-	_ = munmap(alloc->pool, alloc->alloc);
+#if HAVE_MMAP
+	_ = munmap(alloc->raw, alloc->alloc);
 	assert(!_);
+#else
+	free(alloc->raw);
+#endif
 
 exit:
 	return status;
@@ -128,14 +161,18 @@ exit:
 
 void ny_alloc_destroy(struct ny_alloc *restrict alloc) {
 	assert(alloc);
-	assert(alloc->pool);
+	assert(alloc->raw);
 	assert(alloc->alloc);
 
 	int _;
 
 	/* Unmap memory pool */
+#if HAVE_MMAP
 	_ = munmap(alloc->raw, alloc->alloc);
 	assert(!_);
+#else
+	free(alloc->raw);
+#endif
 
 	alloc->raw = nil;
 	alloc->pool = nil;
