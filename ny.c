@@ -62,7 +62,7 @@ int ny_init_(struct ny *restrict ny) {
 	ny->page_size = page_size;
 
 	/* Initialise default loop */
-	ny->loop = ev_default_loop(EVFLAG_AUTO);
+	ny->loop = ev_loop_new(EVFLAG_AUTO);
 	if (unlikely(!ny->loop)) {
 		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVINIT);
 		ret = -1;
@@ -77,5 +77,6 @@ void ny_destroy(struct ny *restrict ny) {
 	assert(ny);
 
 	assert(ny->loop);
+	ev_loop_destroy(ny->loop);
 	ny->loop = nil;
 }
