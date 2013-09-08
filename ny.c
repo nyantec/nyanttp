@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -61,7 +62,7 @@ int ny_init_(struct ny *restrict ny) {
 
 	ny->page_size = page_size;
 
-	/* Initialise default loop */
+	/* Create new event loop */
 	ny->loop = ev_loop_new(EVFLAG_AUTO);
 	if (unlikely(!ny->loop)) {
 		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVINIT);
@@ -88,6 +89,7 @@ static void child_event(struct ev_loop *loop, struct ev_child *child,
 	assert(revents & EV_CHILD);
 
 	/* TODO: Do something useful */
+	ev_break(loop, EVBREAK_ALL);
 }
 
 int ny_run(struct ny *restrict ny, unsigned nproc) {
@@ -98,6 +100,7 @@ int ny_run(struct ny *restrict ny, unsigned nproc) {
 
 #if NY_MPROC
 	struct ev_child procv[nproc];
+	memset(procv, 0, sizeof procv);
 
 	/* Initialise default event loop */
 	struct ev_loop *loop = ev_default_loop(EVFLAG_AUTO);
@@ -110,9 +113,8 @@ int ny_run(struct ny *restrict ny, unsigned nproc) {
 	for (unsigned iter = 0; iter < nproc; ++iter) {
 		pid_t proc = fork();
 		if (unlikely(proc < 0)) {
-			/* TODO: Kill all children */
 			ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
-			goto exit;
+			goto reap;
 		}
 		else if (proc == 0) {
 			/* Run event loop in the child */
@@ -133,6 +135,17 @@ int ny_run(struct ny *restrict ny, unsigned nproc) {
 #endif
 
 	ret = 0;
+
+#if NY_MPROC
+reap:
+	/* Stop watchers and kill children */
+	for (unsigned iter = 0; iter < nproc; ++iter) {
+		if (likely(procv[iter].pid)) {
+			ev_child_stop(loop, procv + iter);
+			kill(procv[iter].pid, SIGTERM);
+		}
+	}
+#endif
 
 exit:
 	return ret;
