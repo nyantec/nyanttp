@@ -21,6 +21,9 @@ AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AX_AM_JOBSERVER
 
+AC_SEARCH_LIBS([socket], [socket nsl])
+AC_SEARCH_LIBS([getaddrinfo], [socket nsl])
+
 AC_HEADER_ASSERT
 AC_HEADER_STDC
 
