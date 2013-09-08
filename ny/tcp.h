@@ -12,8 +12,8 @@ extern "C" {
 
 #include <defy/bool>
 
-#include "error.h"
-#include "ny.h"
+#include <ny/ny.h>
+#include <ny/error.h>
 
 struct ny_tcp;
 struct ny_tcp_conn;

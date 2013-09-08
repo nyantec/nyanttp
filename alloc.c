@@ -21,8 +21,8 @@
 #include <defy/nil>
 #include <defy/pure>
 
-#include "ny.h"
-#include "alloc.h"
+#include <ny/ny.h>
+#include <ny/alloc.h>
 
 static defy_const size_t align(size_t size, size_t alignment) {
 	return (size + alignment - (size_t) 1) & ~(alignment - (size_t) 1);

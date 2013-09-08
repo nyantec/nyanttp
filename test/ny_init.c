@@ -3,7 +3,7 @@
 
 #include <defy/nil>
 
-#include "../ny.h"
+#include <ny/ny.h>
 
 int main(int argc, char *argv[]) {
 	struct ny ny;

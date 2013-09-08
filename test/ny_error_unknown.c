@@ -4,8 +4,8 @@
 
 #include <defy/nil>
 
-#include "../ny.h"
-#include "../error.h"
+#include <ny/ny.h>
+#include <ny/error.h>
 
 int main(int argc, char *argv[]) {
 	struct ny_error error;

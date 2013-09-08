@@ -1,4 +1,4 @@
-#include "../config.h"
+#include "config.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -6,8 +6,8 @@
 
 #include <defy/nil>
 
-#include "../ny.h"
-#include "../alloc.h"
+#include <ny/ny.h>
+#include <ny/alloc.h>
 
 int main(int argc, char *argv[]) {
 	struct ny ny;

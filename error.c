@@ -14,7 +14,7 @@
 #include <defy/expect>
 #include <defy/thread_local>
 
-#include "error.h"
+#include <ny/error.h>
 
 /**
  * \brief Error message buffer

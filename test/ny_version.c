@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "../ny.h"
+#include <ny/ny.h>
 
 int main(int argc, char *argv[]) {
 	assert(ny_version_major() == NY_VERSION_MAJOR);

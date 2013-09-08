@@ -1,6 +1,7 @@
 @INC_AMINCLUDE@
 
-LDADD = ../libny.la
+CPPFLAGS = -I$(top_builddir) -I$(top_srcdir)
+LDADD = $(top_builddir)/libny.la
 
 check_PROGRAMS = \
 	ny_version ny_init ny_destroy \

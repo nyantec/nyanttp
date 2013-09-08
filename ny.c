@@ -18,7 +18,7 @@
 
 #include <ev.h>
 
-#include "ny.h"
+#include <ny/ny.h>
 
 static pthread_once_t once = PTHREAD_ONCE_INIT;
 
