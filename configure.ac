@@ -49,5 +49,5 @@ AC_FUNC_STRERROR_R
 AC_CHECK_DECLS([MAP_ANONYMOUS, MAP_ANON], [], [], [#include <sys/mman.h>])
 AC_CHECK_FUNCS([mprotect posix_madvise])
 
-AC_CONFIG_FILES([Makefile ny/Makefile ny/ny.h test/Makefile])
+AC_CONFIG_FILES([Makefile ny.pc ny/Makefile ny/ny.h test/Makefile])
 AC_OUTPUT
