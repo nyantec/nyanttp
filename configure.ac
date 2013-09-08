@@ -8,7 +8,7 @@ AH_BOTTOM([#include "ny_config.h"])
 
 AC_CANONICAL_TARGET
 AX_ENABLE_BUILDDIR([$target])
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign tar-pax dist-xz no-dist-gzip])
 
 AX_SPLIT_VERSION([AC_PACKAGE_VERSION])
 AC_SUBST([AX_MAJOR_VERSION])
