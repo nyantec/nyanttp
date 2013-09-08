@@ -42,13 +42,12 @@ unsigned int ny_version_micro() {
 int ny_init_(struct ny *restrict ny) {
 	assert(ny);
 
-	int ret = 0;
+	int ret = -1;
 
 	/* Check libev version */
 	if (unlikely(ev_version_major() != EV_VERSION_MAJOR
 		|| ev_version_minor() < EV_VERSION_MINOR)) {
 		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVVER);
-		ret = -1;
 		goto exit;
 	}
 
@@ -56,7 +55,6 @@ int ny_init_(struct ny *restrict ny) {
 	int page_size = sysconf(_SC_PAGE_SIZE);
 	if (unlikely(page_size < 0)) {
 		ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
-		ret = -1;
 		goto exit;
 	}
 
@@ -66,9 +64,10 @@ int ny_init_(struct ny *restrict ny) {
 	ny->loop = ev_loop_new(EVFLAG_AUTO);
 	if (unlikely(!ny->loop)) {
 		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVINIT);
-		ret = -1;
 		goto exit;
 	}
+
+	ret = 0;
 
 exit:
 	return ret;
