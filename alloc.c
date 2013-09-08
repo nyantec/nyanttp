@@ -10,7 +10,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-#if HAVE_MMAP
+#if NY_ALLOC_MMAP
 #	include <sys/mman.h>
 #else
 #	include <stdlib.h>
@@ -79,7 +79,7 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 
 	/* Size of payload without guard pages */
 	size_t payload =
-#if HAVE_MMAP
+#if NY_ALLOC_ALIGN
 		align(number * alloc->size, ny->page_size);
 #else
 		number * alloc->size;
@@ -87,7 +87,7 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 
 	/* Size of memory allocation */
 	alloc->alloc =
-#if HAVE_MMAP
+#if NY_ALLOC_GUARD
 		payload + 2 * ny->page_size;
 #else
 		payload;
@@ -97,14 +97,22 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 	size_t actual = payload / alloc->size;
 
 	/* Allocate memory for pool */
-#if HAVE_MMAP
+#if NY_ALLOC_MMAP
 	alloc->raw = mmap(nil, alloc->alloc, PROT_READ | PROT_WRITE,
 		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (unlikely(alloc->raw == MAP_FAILED)) {
 		ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
 		goto exit;
 	}
+#else
+	alloc->raw = malloc(alloc->alloc);
+	if (unlikely(!alloc->raw)) {
+		ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+		goto exit;
+	}
+#endif
 
+#if NY_ALLOC_GUARD
 	/* Setup lower guard page */
 	if (unlikely(mprotect(alloc->raw, ny->page_size, PROT_NONE))) {
 		ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
@@ -117,22 +125,19 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 		ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
 		goto unmap;
 	}
+#endif
 
-	alloc->pool = alloc->raw + ny->page_size;
+	alloc->pool =
+#if NY_ALLOC_GUARD
+		alloc->raw + ny->page_size;
+#else
+		alloc->raw;
+#endif
 
-#	if HAVE_POSIX_MADVISE
+#if NY_ALLOC_ADVISE
 	/* Advise the OS about the access pattern */
 	posix_madvise(alloc->pool, payload,
 		POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
-#	endif
-#else
-	alloc->raw = malloc(alloc->alloc);
-	if (unlikely(!alloc->raw)) {
-		ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
-		goto exit;
-	}
-
-	alloc->pool = alloc->raw;
 #endif
 
 	/* Initialise free list */
@@ -148,7 +153,7 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 
 unmap:
 	/* Unmap memory pool */
-#if HAVE_MMAP
+#if NY_ALLOC_MMAP
 	_ = munmap(alloc->raw, alloc->alloc);
 	assert(!_);
 #else
@@ -167,7 +172,7 @@ void ny_alloc_destroy(struct ny_alloc *restrict alloc) {
 	int _;
 
 	/* Unmap memory pool */
-#if HAVE_MMAP
+#if NY_ALLOC_MMAP
 	_ = munmap(alloc->raw, alloc->alloc);
 	assert(!_);
 #else

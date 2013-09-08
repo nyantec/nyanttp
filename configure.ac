@@ -4,6 +4,7 @@ AC_INIT([ny], [0.0.0], [mvs@nyantec.com])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([ny.c])
 AC_CONFIG_HEADERS([config.h])
+AH_BOTTOM([#include "ny_config.h"])
 
 AM_INIT_AUTOMAKE([foreign])
 
@@ -41,8 +42,8 @@ AX_LIB_EV
 
 AC_FUNC_MMAP
 AC_FUNC_STRERROR_R
-
-AC_CHECK_FUNCS([posix_madvise])
+AC_CHECK_DECLS([MAP_ANONYMOUS, MAP_ANON], [], [], [#include <sys/mman.h>])
+AC_CHECK_FUNCS([mprotect posix_madvise])
 
 AC_CONFIG_FILES([ny.h Makefile test/Makefile])
 AC_OUTPUT
