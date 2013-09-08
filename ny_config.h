@@ -1,3 +1,7 @@
+#if HAVE_FORK
+#	define NY_MPROC 1
+#endif
+
 #if HAVE_MMAP && (HAVE_DECL_MAP_ANONYMOUS || HAVE_DECL_MAP_ANON)
 #	define NY_ALLOC_MMAP 1
 #	define NY_ALLOC_ALIGN 1
