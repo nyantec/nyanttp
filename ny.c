@@ -6,8 +6,6 @@
 
 #include "config.h"
 
-#include <pthread.h>
-
 #include <assert.h>
 #include <errno.h>
 #include <unistd.h>
@@ -19,20 +17,6 @@
 #include <ev.h>
 
 #include <ny/ny.h>
-
-static pthread_once_t once = PTHREAD_ONCE_INIT;
-
-static void atfork() {
-	ev_loop_fork(EV_DEFAULT);
-}
-
-static void setup_once() {
-	int _;
-
-	/* Register fork handler */
-	_ = pthread_atfork(nil, nil, atfork);
-	assert(!_);
-}
 
 unsigned int ny_version_major() {
 	return NY_VERSION_MAJOR;
@@ -84,10 +68,6 @@ int ny_init_(struct ny *restrict ny) {
 		ret = -1;
 		goto exit;
 	}
-
-	/* One-time initialisation */
-	_ = pthread_once(&once, setup_once);
-	assert(!_);
 
 exit:
 	return ret;

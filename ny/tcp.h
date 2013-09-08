@@ -14,6 +14,7 @@ extern "C" {
 
 #include <ny/ny.h>
 #include <ny/error.h>
+#include <ny/alloc.h>
 
 struct ny_tcp;
 struct ny_tcp_conn;
@@ -24,6 +25,7 @@ struct ny_tcp_conn;
 struct ny_tcp {
 	void *data; /**< User data */
 	struct ny *ny; /**< Context structure */
+	struct ny_alloc alloc_conn; /**< Connection memory pool */
 	struct ev_io io; /**< I/O watcher */
 	void (*event_tcp_error)(struct ny_tcp *restrict, struct ny_error const *restrict);
 	bool (*event_tcp_connect)(struct ny_tcp *restrict, struct sockaddr_in6 const *restrict); /**< Connect event handler */
