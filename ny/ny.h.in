@@ -88,6 +88,16 @@ extern int ny_init_(struct ny *restrict ny) nothrow;
  */
 extern void ny_destroy(struct ny *restrict ny) nothrow;
 
+/**
+ * \brief Run ny
+ *
+ * \param[in,out] ny Pointer to context structure
+ * \param[in] nproc Number of worker processes
+ *
+ * \return Zero on success or non-zero on error
+ */
+extern int ny_run(struct ny *restrict ny, unsigned nproc) nothrow;
+
 #if defined __cplusplus
 }
 #endif

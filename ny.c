@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <defy/expect>
@@ -40,7 +41,6 @@ unsigned int ny_version_micro() {
 int ny_init_(struct ny *restrict ny) {
 	assert(ny);
 
-	int _;
 	int ret = 0;
 
 	/* Check libev version */
@@ -79,4 +79,61 @@ void ny_destroy(struct ny *restrict ny) {
 	assert(ny->loop);
 	ev_loop_destroy(ny->loop);
 	ny->loop = nil;
+}
+
+static void child_event(struct ev_loop *loop, struct ev_child *child,
+	int revents) {
+	assert(loop);
+	assert(child);
+	assert(revents & EV_CHILD);
+
+	/* TODO: Do something useful */
+}
+
+int ny_run(struct ny *restrict ny, unsigned nproc) {
+	assert(ny);
+	assert(nproc < sysconf(_SC_CHILD_MAX));
+
+	int ret = -1;
+
+#if NY_MPROC
+	struct ev_child procv[nproc];
+
+	/* Initialise default event loop */
+	struct ev_loop *loop = ev_default_loop(EVFLAG_AUTO);
+	if (unlikely(!loop)) {
+		ny_error_set(&ny->error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVINIT);
+		goto exit;
+	}
+
+	/* Fork children */
+	for (unsigned iter = 0; iter < nproc; ++iter) {
+		pid_t proc = fork();
+		if (unlikely(proc < 0)) {
+			/* TODO: Kill all children */
+			ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+			goto exit;
+		}
+		else if (proc == 0) {
+			/* Run event loop in the child */
+			ev_loop_fork(ny->loop);
+			ev_run(ny->loop, 0);
+			exit(EXIT_SUCCESS);
+		}
+
+		/* Setup child watcher */
+		ev_child_init(procv + iter, child_event, proc, 0);
+		procv[iter].data = procv + iter;
+		ev_child_start(loop, procv + iter);
+	}
+
+	ev_run(loop, 0);
+#else
+	ev_run(ny->loop, 0);
+#endif
+
+	ret = 0;
+
+exit:
+	return ret;
 }
