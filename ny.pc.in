@@ -8,4 +8,5 @@ Description: HTTP server library
 Version: @PACKAGE_VERSION@
 Requires.private: libev
 Libs: -L${libdir} -lny
+Libs.private: @LIBS@
 Cflags: -I${includedir}
