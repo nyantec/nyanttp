@@ -35,6 +35,7 @@ struct ny_tcp {
 	void (*event_conn_readable)(struct ny_tcp_conn *restrict);
 	void (*event_conn_writable)(struct ny_tcp_conn *restrict);
 	bool (*event_conn_timeout)(struct ny_tcp_conn *restrict);
+	int goat; /**< Reserve file descriptor */
 };
 
 /**
