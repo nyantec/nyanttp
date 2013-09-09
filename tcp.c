@@ -118,8 +118,7 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 		tcp->event_tcp_error(tcp, &error);
 	}
 	else if (likely(revents & EV_READ)) {
-		/* Accept up to 256 new connections */
-		for (unsigned iter = 0; iter <= 255; ++iter) {
+		for (unsigned iter = 0; iter < NY_TCP_ACCEPT_MAX; ++iter) {
 			struct sockaddr_in6 address;
 			socklen_t addrlen = sizeof address;
 

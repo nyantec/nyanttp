@@ -19,3 +19,6 @@
 #		define NY_ALLOC_ADVISE 1
 #	endif
 #endif
+
+/* Maximum number of TCP connections to accept per event */
+#define NY_TCP_ACCEPT_MAX 16
