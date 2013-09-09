@@ -226,8 +226,8 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			conn->data = nil;
 
 			/* Initialise timeout watcher */
-			/* FIXME: Hard-coded timeout value */
-			ev_timer_init(&conn->timer, timeout_event, 60.0, 60.0);
+			ev_timer_init(&conn->timer, timeout_event,
+				NY_TCP_TIMEOUT, NY_TCP_TIMEOUT);
 			conn->timer.data = conn;
 			ev_timer_start(EV_A_ &conn->timer);
 

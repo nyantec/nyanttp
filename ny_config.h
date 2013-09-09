@@ -22,3 +22,6 @@
 
 /* Maximum number of TCP connections to accept per event */
 #define NY_TCP_ACCEPT_MAX 16
+
+/* TCP connection activity timeout */
+#define NY_TCP_TIMEOUT 60.0
