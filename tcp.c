@@ -121,42 +121,42 @@ static int accept_safe(struct ny_tcp *restrict tcp,
 	return csock;
 }
 
-static void conn_event(EV_P_ ev_io io, int revents) {
-	struct ny_tcp_conn *conn = (struct ny_tcp_conn *) io.data;
+static void con_event(EV_P_ ev_io io, int revents) {
+	struct ny_tcp_con *con = (struct ny_tcp_con *) io.data;
 
 	if (unlikely(revents & EV_ERROR)) {
 		struct ny_error error;
 		ny_error_set(&error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVWATCH);
-		conn->tcp->event_conn_error(conn, &error);
+		con->tcp->con_error(con, &error);
 	}
 	else {
 		if (revents & EV_READ) {
-			if (conn->tcp->event_conn_readable)
-				conn->tcp->event_conn_readable(conn);
+			if (con->tcp->con_readable)
+				con->tcp->con_readable(con);
 		}
 
 		if (revents & EV_WRITE) {
-			if (conn->tcp->event_conn_writable)
-				conn->tcp->event_conn_writable(conn);
+			if (con->tcp->con_writable)
+				con->tcp->con_writable(con);
 		}
 	}
 }
 
 static void timeout_event(EV_P_ ev_timer timer, int revents) {
-	struct ny_tcp_conn *conn = (struct ny_tcp_conn *) timer.data;
+	struct ny_tcp_con *con = (struct ny_tcp_con *) timer.data;
 
 	if (unlikely(revents & EV_ERROR)) {
 		struct ny_error error;
 		ny_error_set(&error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVWATCH);
-		conn->tcp->event_conn_error(conn, &error);
+		con->tcp->con_error(con, &error);
 	}
 	else if (likely(revents & EV_TIMEOUT)) {
 		/* Raise timeout event */
-		if (conn->tcp->event_conn_timeout)
-			if (unlikely(conn->tcp->event_conn_timeout(conn)))
+		if (con->tcp->con_timeout)
+			if (unlikely(con->tcp->con_timeout(con)))
 				return;
 
-		ny_tcp_conn_destroy(conn);
+		ny_tcp_con_destroy(con);
 	}
 }
 
@@ -166,7 +166,7 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 	if (unlikely(revents & EV_ERROR)) {
 		struct ny_error error;
 		ny_error_set(&error, NY_ERROR_DOMAIN_NY, NY_ERROR_EVWATCH);
-		tcp->event_tcp_error(tcp, &error);
+		tcp->tcp_error(tcp, &error);
 	}
 
 	else if (likely(revents & EV_READ)) {
@@ -180,10 +180,10 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			/* Handle errors */
 			if (unlikely(fd < 0)) {
 				if (unlikely(errno != EAGAIN || errno != EWOULDBLOCK)) {
-					if (tcp->event_tcp_error) {
+					if (tcp->tcp_error) {
 						struct ny_error error;
 						ny_error_set(&error, NY_ERROR_DOMAIN_ERRNO, errno);
-						tcp->event_tcp_error(tcp, &error);
+						tcp->tcp_error(tcp, &error);
 					}
 				}
 
@@ -199,9 +199,9 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			/* Assume that all addresses are IPv6 */
 			assert(address.sin6_family == AF_INET6);
 
-			/* Raise connect event */
-			if (tcp->event_tcp_connect) {
-				if (unlikely(!tcp->event_tcp_connect(tcp, &address))) {
+			/* Raise conect event */
+			if (tcp->tcp_connect) {
+				if (unlikely(!tcp->tcp_connect(tcp, &address))) {
 					/* Reject connection */
 					close_retry(fd);
 					continue;
@@ -209,12 +209,12 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			}
 
 			/* Allocate memory for connection structure */
-			struct ny_tcp_conn *conn = malloc(sizeof (struct ny_tcp_conn));
-			if (unlikely(!conn)) {
-				if (tcp->event_tcp_error) {
+			struct ny_tcp_con *con = malloc(sizeof (struct ny_tcp_con));
+			if (unlikely(!con)) {
+				if (tcp->tcp_error) {
 					struct ny_error error;
 					ny_error_set(&error, NY_ERROR_DOMAIN_ERRNO, errno);
-					tcp->event_tcp_error(tcp, &error);
+					tcp->tcp_error(tcp, &error);
 				}
 
 				/* Close connection */
@@ -223,18 +223,18 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			}
 
 			/* Initialise user-data pointer */
-			conn->data = nil;
+			con->data = nil;
 
 			/* Initialise timeout watcher */
-			ev_timer_init(&conn->timer, timeout_event,
+			ev_timer_init(&con->timer, timeout_event,
 				NY_TCP_TIMEOUT, NY_TCP_TIMEOUT);
-			conn->timer.data = conn;
-			ev_timer_start(EV_A_ &conn->timer);
+			con->timer.data = con;
+			ev_timer_start(EV_A_ &con->timer);
 
 			/* Initialise I/O watcher */
-			ev_io_init(&conn->io, conn_event, fd, EV_READ);
-			conn->io.data = conn;
-			ev_io_start(EV_A_ &conn->io);
+			ev_io_init(&con->io, con_event, fd, EV_READ);
+			con->io.data = con;
+			ev_io_start(EV_A_ &con->io);
 		}
 	}
 }
@@ -250,12 +250,12 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 	/* Initialise structure */
 	tcp->data = nil;
 	tcp->ny = ny;
-	tcp->event_tcp_error = nil;
-	tcp->event_tcp_connect = nil;
-	tcp->event_conn_error = nil;
-	tcp->event_conn_readable = nil;
-	tcp->event_conn_writable = nil;
-	tcp->event_conn_timeout = nil;
+	tcp->tcp_error = nil;
+	tcp->tcp_connect = nil;
+	tcp->con_error = nil;
+	tcp->con_readable = nil;
+	tcp->con_writable = nil;
+	tcp->con_timeout = nil;
 
 	/* Duplicate standard input as a reserve file descriptor */
 	tcp->goat = goat_new();
@@ -332,27 +332,27 @@ exit:
 	return ret;
 }
 
-void ny_tcp_conn_destroy(struct ny_tcp_conn *restrict conn) {
-	assert(conn);
+void ny_tcp_con_destroy(struct ny_tcp_con *restrict con) {
+	assert(con);
 
 	/* Call destroy event handler */
-	if (conn->tcp->event_conn_destroy)
-		conn->tcp->event_conn_destroy(conn);
+	if (con->tcp->con_destroy)
+		con->tcp->con_destroy(con);
 
 	/* Stop watchers */
-	ev_io_stop(conn->tcp->ny->loop, &conn->io);
-	ev_timer_stop(conn->tcp->ny->loop, &conn->timer);
+	ev_io_stop(con->tcp->ny->loop, &con->io);
+	ev_timer_stop(con->tcp->ny->loop, &con->timer);
 
 	/* Close socket */
-	close_retry(conn->io.fd);
+	close_retry(con->io.fd);
 
 	/* Free structure */
-	free(conn);
+	free(con);
 }
 
-void ny_tcp_conn_touch(struct ny_tcp_conn *restrict conn) {
-	assert(conn);
+void ny_tcp_con_touch(struct ny_tcp_con *restrict con) {
+	assert(con);
 
 	/* Reset timeout timer */
-	ev_timer_again(conn->tcp->ny->loop, &conn->timer);
+	ev_timer_again(con->tcp->ny->loop, &con->timer);
 }

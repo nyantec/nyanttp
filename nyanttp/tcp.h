@@ -17,7 +17,7 @@ extern "C" {
 #include <nyanttp/alloc.h>
 
 struct ny_tcp;
-struct ny_tcp_conn;
+struct ny_tcp_con;
 
 /**
  * \brief TCP listener context
@@ -27,21 +27,21 @@ struct ny_tcp {
 	struct ny *ny; /**< Context structure */
 	struct ny_alloc alloc_conn; /**< Connection memory pool */
 	struct ev_io io; /**< I/O watcher */
-	void (*event_tcp_error)(struct ny_tcp *restrict, struct ny_error const *restrict);
-	bool (*event_tcp_connect)(struct ny_tcp *restrict, struct sockaddr_in6 const *restrict); /**< Connect event handler */
+	void (*tcp_error)(struct ny_tcp *restrict, struct ny_error const *restrict);
+	bool (*tcp_connect)(struct ny_tcp *restrict, struct sockaddr_in6 const *restrict); /**< Connect event handler */
 
-	void (*event_conn_error)(struct ny_tcp_conn *restrict, struct ny_error const *restrict);
-	void (*event_conn_destroy)(struct ny_tcp_conn *restrict);
-	void (*event_conn_readable)(struct ny_tcp_conn *restrict);
-	void (*event_conn_writable)(struct ny_tcp_conn *restrict);
-	bool (*event_conn_timeout)(struct ny_tcp_conn *restrict);
+	void (*con_error)(struct ny_tcp_con *restrict, struct ny_error const *restrict);
+	void (*con_destroy)(struct ny_tcp_con *restrict);
+	void (*con_readable)(struct ny_tcp_con *restrict);
+	void (*con_writable)(struct ny_tcp_con *restrict);
+	bool (*con_timeout)(struct ny_tcp_con *restrict);
 	int goat; /**< Reserve file descriptor */
 };
 
 /**
  * \brief TCP connection context
  */
-struct ny_tcp_conn {
+struct ny_tcp_con {
 	void *data; /**< User data */
 	struct ny_tcp *tcp; /**< TCP listener */
 	struct ev_timer timer; /**< Timeout watcher */
