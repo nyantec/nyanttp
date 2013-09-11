@@ -11,6 +11,8 @@
 /*-*-*-*/
 
 # Autotools cruft
+*~
+
 Makefile
 Makefile.in
 
@@ -30,6 +32,5 @@ Makefile.in
 /depcomp
 /install-sh
 /ltmain.sh
-/makefile.sed~
 /missing
 /test-driver
