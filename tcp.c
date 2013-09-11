@@ -359,7 +359,7 @@ void ny_tcp_con_touch(struct ny_tcp_con *restrict con) {
 	ev_timer_again(con->tcp->ny->loop, &con->timer);
 }
 
-ssize_t ny_tcp_con_recv(struct ny_tcp_conn *restrict con,
+ssize_t ny_tcp_con_recv(struct ny_tcp_con *restrict con,
 	void *restrict buffer, size_t length) {
 	assert(con);
 	assert(buffer);
@@ -370,14 +370,17 @@ ssize_t ny_tcp_con_recv(struct ny_tcp_conn *restrict con,
 		rlen = read(con->io.fd, buffer, length);
 	} while (unlikely(rlen < 0 && errno == EINTR));
 
+	if (unlikely(rlen < 0))
+		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+
 	/* Reset timeout */
-	if (rlen > 0)
+	else if (likely(rlen > 0))
 		ny_tcp_con_touch(con);
 
 	return rlen;
 }
 
-ssize_t ny_tcp_con_send(struct ny_tcp_conn *restrict con,
+ssize_t ny_tcp_con_send(struct ny_tcp_con *restrict con,
 	void const *restrict buffer, size_t length) {
 	assert(con);
 	assert(buffer);
@@ -388,9 +391,14 @@ ssize_t ny_tcp_con_send(struct ny_tcp_conn *restrict con,
 		wlen = write(con->io.fd, buffer, length);
 	} while (unlikely(wlen < 0 && errno == EINTR));
 
+	if (unlikely(wlen < 0))
+		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+
 	/* Reset timeout */
-	if (wlen > 0)
+	else if (likely(wlen > 0))
 		ny_tcp_con_touch(con);
 
 	return wlen;
 }
+
+
