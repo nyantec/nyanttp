@@ -27,10 +27,13 @@ struct ny_tcp {
 	struct ny *ny; /**< Context structure */
 	struct ny_alloc alloc_conn; /**< Connection memory pool */
 	struct ev_io io; /**< I/O watcher */
-	void (*tcp_error)(struct ny_tcp *restrict, struct ny_error const *restrict);
-	bool (*tcp_connect)(struct ny_tcp *restrict, struct sockaddr_in6 const *restrict); /**< Connect event handler */
+	void (*tcp_error)(struct ny_tcp *restrict,
+		struct ny_error const *restrict);
+	bool (*tcp_connect)(struct ny_tcp *restrict,
+		struct sockaddr_in6 const *restrict); /**< Connect event handler */
 
-	void (*con_error)(struct ny_tcp_con *restrict, struct ny_error const *restrict);
+	void (*con_error)(struct ny_tcp_con *restrict,
+		struct ny_error const *restrict);
 	void (*con_destroy)(struct ny_tcp_con *restrict);
 	void (*con_readable)(struct ny_tcp_con *restrict);
 	void (*con_writable)(struct ny_tcp_con *restrict);
@@ -58,7 +61,8 @@ struct ny_tcp_con {
  * \param[in] node Host name or address
  * \param[in] service Service name or port number
  */
-extern int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny, char const *restrict node, char const *restrict service);
+extern int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
+	char const *restrict node, char const *restrict service);
 
 /**
  * \brief Destroy TCP context
@@ -69,9 +73,15 @@ extern void ny_tcp_destroy(struct ny_tcp *restrict tcp);
 
 extern int ny_tcp_listen(struct ny_tcp *restrict tcp);
 
-extern void ny_tcp_conn_destroy(struct ny_tcp_conn *restrict conn);
+extern void ny_tcp_con_destroy(struct ny_tcp_con *restrict con);
 
-extern void ny_tcp_conn_touch(struct ny_tcp_conn *restrict conn);
+extern void ny_tcp_con_touch(struct ny_tcp_con *restrict con);
+
+extern ssize_t ny_tcp_con_recv(struct ny_tcp_con *restrict con,
+	void *restrict buffer, size_t length);
+
+extern ssize_t ny_tcp_con_send(struct ny_tcp_con *restrict con,
+	void const *restrict buffer, size_t length);
 
 #if defined __cplusplus
 }
