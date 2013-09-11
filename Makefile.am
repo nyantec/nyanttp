@@ -6,7 +6,7 @@ libny_la_CFLAGS = $(AM_CFLAGS) $(libev_CFLAGS)
 libny_la_LDFLAGS = $(AM_LDFLAGS) $(libev_LIBS)
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = ny.pc
+pkgconfig_DATA = nyanttp.pc
 
 EXTRA_DIST = Licence
 
