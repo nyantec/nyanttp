@@ -10,4 +10,4 @@ pkgconfig_DATA = nyanttp.pc
 
 EXTRA_DIST = Licence
 
-SUBDIRS = ny test
+SUBDIRS = nyanttp test

@@ -19,8 +19,8 @@
 #include <defy/nil>
 #include <defy/restrict>
 
-#include <ny/ny.h>
-#include <ny/tcp.h>
+#include <nyanttp/ny.h>
+#include <nyanttp/tcp.h>
 
 /**
  * \brief Address resolution hints

@@ -6,8 +6,8 @@
 
 #include <defy/nil>
 
-#include <ny/ny.h>
-#include <ny/alloc.h>
+#include <nyanttp/ny.h>
+#include <nyanttp/alloc.h>
 
 int main(int argc, char *argv[]) {
 	struct ny ny;

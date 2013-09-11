@@ -5,8 +5,8 @@
 
 #include <defy/nil>
 
-#include <ny/ny.h>
-#include <ny/error.h>
+#include <nyanttp/ny.h>
+#include <nyanttp/error.h>
 
 int main(int argc, char *argv[]) {
 	struct ny_error error;

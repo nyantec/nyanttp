@@ -12,9 +12,9 @@ extern "C" {
 
 #include <defy/bool>
 
-#include <ny/ny.h>
-#include <ny/error.h>
-#include <ny/alloc.h>
+#include <nyanttp/ny.h>
+#include <nyanttp/error.h>
+#include <nyanttp/alloc.h>
 
 struct ny_tcp;
 struct ny_tcp_conn;

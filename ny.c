@@ -19,7 +19,7 @@
 
 #include <ev.h>
 
-#include <ny/ny.h>
+#include <nyanttp/ny.h>
 
 unsigned int ny_version_major() {
 	return NY_VERSION_MAJOR;

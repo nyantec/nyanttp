@@ -4,8 +4,8 @@
 
 #include <defy/nil>
 
-#include <ny/ny.h>
-#include <ny/alloc.h>
+#include <nyanttp/ny.h>
+#include <nyanttp/alloc.h>
 
 int main(int argc, char *argv[]) {
 	uint_least32_t const num = 262144;
