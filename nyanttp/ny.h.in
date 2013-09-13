@@ -18,7 +18,7 @@ extern "C" {
 #include <defy/nothrow>
 #include <defy/restrict>
 
-#include <ny/error.h>
+#include <nyanttp/error.h>
 
 /**
  * \brief Major version number
