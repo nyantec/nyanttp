@@ -6,6 +6,8 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
 #include <ev.h>
 
 #include <nyanttp/ny.h>
@@ -22,7 +24,9 @@ struct ny_http_req;
  */
 struct ny_http {
 	void *data; /**< User data */
-	struct ny_alloc alloc_req; /**< Request memory pool */
+
+	void (*req_readable)(struct ny_http_req *restrict);
+	void (*req_writable)(struct ny_http_req *restrict);
 
 	ssize_t (*recv)(void *restrict, void *restrict, size_t);
 	ssize_t (*send)(void *restrict, void const *restrict, size_t);
@@ -36,6 +40,10 @@ struct ny_http_con {
 	void *ctx; /**< I/O context */
 
 	struct ny_http *http;
+
+	uint8_t *buffer; /**< Request buffer */
+	size_t offset; /**< Buffer offset */
+	size_t length; /**< Buffer capacity */
 };
 
 /**
