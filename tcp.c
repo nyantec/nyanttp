@@ -214,13 +214,10 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			}
 
 			/* Allocate memory for connection structure */
-			struct ny_tcp_con *con = malloc(sizeof (struct ny_tcp_con));
+			struct ny_tcp_con *con = ny_alloc_acquire(&tcp->alloc_con);
 			if (unlikely(!con)) {
-				if (tcp->tcp_error) {
-					struct ny_error error;
-					ny_error_set(&error, NY_ERROR_DOMAIN_ERRNO, errno);
-					tcp->tcp_error(tcp, &error);
-				}
+				if (tcp->tcp_error)
+					tcp->tcp_error(tcp, &tcp->ny->error);
 
 				/* Close connection */
 				close_retry(fd);
@@ -264,9 +261,6 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 	tcp->con_writable = nil;
 	tcp->con_timeout = nil;
 
-	/* Duplicate standard input as a reserve file descriptor */
-	tcp->goat = goat_new();
-
 	struct addrinfo *res;
 
 	_ = getaddrinfo(node, service, &hints, &res);
@@ -305,6 +299,15 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 	ev_set_priority(&tcp->io, NY_TCP_IO_PRIO);
 	tcp->io.data = tcp;
 
+	/* Initialise allocator */
+	/* FIXME: Hardcoded value */
+	_ = ny_alloc_init(&tcp->alloc_con, ny, 1024, sizeof (struct ny_tcp_con));
+	if (unlikely(_))
+		goto exit;
+
+	/* Duplicate standard input as a reserve file descriptor */
+	tcp->goat = goat_new();
+
 exit:
 	if (likely(res))
 		freeaddrinfo(res);
@@ -319,7 +322,13 @@ void ny_tcp_destroy(struct ny_tcp *restrict tcp) {
 
 	/* Close socket */
 	_ = close_retry(tcp->io.fd);
+	assert(_);
 
+	/* Destroy allocator */
+	ny_alloc_destroy(&tcp->alloc_con);
+
+	/* Close reserve file descriptor */
+	_ = close_retry(tcp->goat);
 	assert(_);
 }
 

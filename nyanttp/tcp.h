@@ -25,7 +25,7 @@ struct ny_tcp_con;
 struct ny_tcp {
 	void *data; /**< User data */
 	struct ny *ny; /**< Context structure */
-	struct ny_alloc alloc_conn; /**< Connection memory pool */
+	struct ny_alloc alloc_con; /**< Connection memory pool */
 	struct ev_io io; /**< I/O watcher */
 	void (*tcp_error)(struct ny_tcp *restrict,
 		struct ny_error const *restrict);
