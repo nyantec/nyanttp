@@ -230,11 +230,13 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 			/* Initialise timeout watcher */
 			ev_timer_init(&con->timer, timeout_event,
 				NY_TCP_TIMEOUT, NY_TCP_TIMEOUT);
+			ev_set_priority(&con->timer, NY_TCP_TIMER_PRIO);
 			con->timer.data = con;
 			ev_timer_start(EV_A_ &con->timer);
 
 			/* Initialise I/O watcher */
 			ev_io_init(&con->io, con_event, fd, EV_READ);
+			ev_set_priority(&con->io, NY_TCP_ACCEPT_PRIO);
 			con->io.data = con;
 			ev_io_start(EV_A_ &con->io);
 		}
@@ -297,6 +299,7 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 
 	/* Initialise I/O watcher */
 	ev_io_init(&tcp->io, listen_event, fd, EV_READ);
+	ev_set_priority(&tcp->io, NY_TCP_IO_PRIO);
 	tcp->io.data = tcp;
 
 exit:

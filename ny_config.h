@@ -25,3 +25,12 @@
 
 /* TCP connection activity timeout */
 #define NY_TCP_TIMEOUT 60.0
+
+/* TCP accept event priority */
+#define NY_TCP_ACCEPT_PRIO EV_MINPRI
+
+/* TCP timeout event priority */
+#define NY_TCP_TIMER_PRIO (EV_MINPRI / 2)
+
+/* TCP I/O event priority */
+#define NY_TCP_IO_PRIO 0
