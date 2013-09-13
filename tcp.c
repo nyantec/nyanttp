@@ -154,9 +154,12 @@ static void timeout_event(EV_P_ ev_timer timer, int revents) {
 	}
 	else if (likely(revents & EV_TIMEOUT)) {
 		/* Raise timeout event */
-		if (con->tcp->con_timeout)
-			if (unlikely(con->tcp->con_timeout(con)))
+		if (con->tcp->con_timeout) {
+			if (unlikely(con->tcp->con_timeout(con))) {
+				ny_tcp_con_touch(con);
 				return;
+			}
+		}
 
 		ny_tcp_con_destroy(con);
 	}
