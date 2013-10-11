@@ -62,12 +62,13 @@ void ny_http_con_readable(struct ny_http_con *restrict con) {
 		con->length = length;
 	}
 
-	size_t rlen = con->http->recv(con->ctx, buffer + offset, length - offset);
+	size_t rlen = con->http->recv(con->ctx, con->buffer + con->offset,
+		con->length - con->offset);
 	if (unlikely(rlen < 0)) {
 		/* TODO: Handle error */
 	}
 
-	offset += rlen;
+	con->offset += rlen;
 
 	/* TODO: Parse data */
 }
