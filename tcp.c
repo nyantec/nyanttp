@@ -81,6 +81,35 @@ static int close_retry(int fd) {
 }
 
 /**
+ * \brief Accept new connection, setting flags
+ *
+ * \param[in] lsock File descriptor of the listening socket
+ * \param[out] address Pointer to a \c sockaddr structure to hold the address of the connecting socket
+ * \param[in,out] addrlen Capacity of the structure given by \p address on input, the actual length of the stored address on output
+ *
+ * \return Non-negative file descriptor of the accepted socket or a negative integer on failure
+ */
+static int accept_flags(int lsock, struct sockaddr *restrict address,
+	socklen_t *restrict addrlen) {
+	int csock =
+#if HAVE_ACCEPT4
+		accept4(lsock, address, addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
+#else
+		accept(lsock, address, addrlen);
+
+	if (likely(csock >= 0)) {
+		/* Close socket on exec */
+		ny_fd_set(fd, FD_CLOEXEC);
+
+		/* Mark socket as non-blocking */
+		ny_fl_set(fd, O_NONBLOCK);
+	}
+#endif
+
+	return csock;
+}
+
+/**
  * \brief Accept new connection, retrying if interrupted
  *
  * \param[in] lsock File descriptor of the listening socket
@@ -94,7 +123,7 @@ static int accept_retry(int lsock, struct sockaddr *restrict address,
 	int csock;
 
 	do {
-		csock = accept(lsock, address, addrlen);
+		csock = accept_flags(lsock, address, addrlen);
 	} while (unlikely(csock < 0 && errno == EINTR));
 
 	return csock;
@@ -194,12 +223,6 @@ static void listen_event(EV_P_ ev_io io, int revents) {
 
 				break;
 			}
-
-			/* Close socket on exec */
-			ny_fd_set(fd, FD_CLOEXEC);
-
-			/* Mark socket as non-blocking */
-			ny_fl_set(fd, O_NONBLOCK);
 
 			/* Assume that all addresses are IPv6 */
 			assert(address.sin6_family == AF_INET6);
