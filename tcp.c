@@ -152,8 +152,8 @@ static int accept_safe(struct ny_tcp *restrict tcp,
 	return csock;
 }
 
-static void con_event(EV_P_ ev_io io, int revents) {
-	struct ny_tcp_con *con = (struct ny_tcp_con *) io.data;
+static void con_event(EV_P_ struct ev_io *io, int revents) {
+	struct ny_tcp_con *con = (struct ny_tcp_con *) io->data;
 
 	if (unlikely(revents & EV_ERROR)) {
 		struct ny_error error;
@@ -173,8 +173,8 @@ static void con_event(EV_P_ ev_io io, int revents) {
 	}
 }
 
-static void timeout_event(EV_P_ ev_timer timer, int revents) {
-	struct ny_tcp_con *con = (struct ny_tcp_con *) timer.data;
+static void timeout_event(EV_P_ struct ev_timer *timer, int revents) {
+	struct ny_tcp_con *con = (struct ny_tcp_con *) timer->data;
 
 	if (unlikely(revents & EV_ERROR)) {
 		struct ny_error error;
@@ -194,8 +194,8 @@ static void timeout_event(EV_P_ ev_timer timer, int revents) {
 	}
 }
 
-static void listen_event(EV_P_ ev_io io, int revents) {
-	struct ny_tcp *tcp = (struct ny_tcp *) io.data;
+static void listen_event(EV_P_ struct ev_io *io, int revents) {
+	struct ny_tcp *tcp = (struct ny_tcp *) io->data;
 
 	if (unlikely(revents & EV_ERROR)) {
 		struct ny_error error;
