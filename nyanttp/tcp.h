@@ -60,9 +60,11 @@ struct ny_tcp_con {
  * \param[in,out] ny Pointer to context structure
  * \param[in] node Host name or address
  * \param[in] service Service name or port number
+ * \param[in] maxcon Maximum number of connections per worker
  */
 extern int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
-	char const *restrict node, char const *restrict service);
+	char const *restrict node, char const *restrict service,
+	uint_least32_t maxcon);
 
 /**
  * \brief Destroy TCP context

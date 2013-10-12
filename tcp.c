@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -275,7 +276,8 @@ static void listen_event(EV_P_ struct ev_io *io, int revents) {
 }
 
 int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
-	char const *restrict node, char const *restrict service) {
+	char const *restrict node, char const *restrict service,
+	uint_least32_t maxcon) {
 	assert(tcp);
 	assert(ny);
 
@@ -331,8 +333,7 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 	tcp->io.data = tcp;
 
 	/* Initialise allocator */
-	/* FIXME: Hardcoded value */
-	_ = ny_alloc_init(&tcp->alloc_con, ny, 1024, sizeof (struct ny_tcp_con));
+	_ = ny_alloc_init(&tcp->alloc_con, ny, maxcon, sizeof (struct ny_tcp_con));
 	if (unlikely(_))
 		goto exit;
 
