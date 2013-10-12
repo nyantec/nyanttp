@@ -59,11 +59,11 @@ extern unsigned int ny_version_major() nothrow defy_const;
 extern unsigned int ny_version_minor() nothrow defy_const;
 
 /**
- * \brief Get patch version number
+ * \brief Get micro version number
  *
- * \return Patch version number
+ * \return Micro version number
  */
-extern unsigned int ny_version_patch() nothrow defy_const;
+extern unsigned int ny_version_micro() nothrow defy_const;
 
 /**
  * \brief Initialise context
