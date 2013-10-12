@@ -86,7 +86,7 @@ extern ssize_t ny_tcp_con_send(struct ny_tcp_con *restrict con,
 	void const *restrict buffer, size_t length);
 
 extern ssize_t ny_tcp_con_sendfile(struct ny_tcp_con *restrict con,
-	int fd, off_t offset, size_t length);
+	int fd, size_t length, off_t offset);
 
 #if defined __cplusplus
 }

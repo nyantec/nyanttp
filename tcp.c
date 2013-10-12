@@ -32,6 +32,7 @@
 
 #include <nyanttp/ny.h>
 #include <nyanttp/tcp.h>
+#include <nyanttp/io.h>
 
 /**
  * \brief Address resolution hints
@@ -45,114 +46,31 @@ static struct addrinfo const hints = {
 	.ai_protocol = IPPROTO_TCP
 };
 
-static void fcntl_set(int fd, int get, int set, int flags) {
-	int _;
-
-	_ = fcntl(fd, get);
-	assert(_ >= 0);
-	_ = fcntl(fd, set, _ | flags);
-	assert(_);
-}
-
-static void ny_fd_set(int fd, int flags) {
-	fcntl_set(fd, F_GETFD, F_SETFD, flags);
-}
-
-static void ny_fl_set(int fd, int flags) {
-	fcntl_set(fd, F_GETFL, F_SETFL, flags);
-}
-
 static int goat_new() {
 	int goat = fcntl(0, F_DUPFD, 0);
 	assert(goat >= 0);
 
 	/* Close on exec */
-	ny_fd_set(goat, FD_CLOEXEC);
+	ny_io_fd_set(goat, FD_CLOEXEC);
 
 	return goat;
-}
-
-/**
- * \brief Close file descriptor, retrying if interrupted
- *
- * \param[in] fd File descriptor to close
- *
- * \return Zero on success or non-zero on failure
- */
-static int close_retry(int fd) {
-	int ret;
-
-	do {
-		ret = close(fd);
-	} while (ret && errno == EINTR);
-
-	return ret;
-}
-
-/**
- * \brief Accept new connection, setting flags
- *
- * \param[in] lsock File descriptor of the listening socket
- * \param[out] address Pointer to a \c sockaddr structure to hold the address of the connecting socket
- * \param[in,out] addrlen Capacity of the structure given by \p address on input, the actual length of the stored address on output
- *
- * \return Non-negative file descriptor of the accepted socket or a negative integer on failure
- */
-static int accept_flags(int lsock, struct sockaddr *restrict address,
-	socklen_t *restrict addrlen) {
-	int csock =
-#if HAVE_ACCEPT4
-		accept4(lsock, address, addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
-#else
-		accept(lsock, address, addrlen);
-
-	if (likely(csock >= 0)) {
-		/* Close socket on exec */
-		ny_fd_set(fd, FD_CLOEXEC);
-
-		/* Mark socket as non-blocking */
-		ny_fl_set(fd, O_NONBLOCK);
-	}
-#endif
-
-	return csock;
-}
-
-/**
- * \brief Accept new connection, retrying if interrupted
- *
- * \param[in] lsock File descriptor of the listening socket
- * \param[out] address Pointer to a \c sockaddr structure to hold the address of the connecting socket
- * \param[in,out] addrlen Capacity of the structure given by \p address on input, the actual length of the stored address on output
- *
- * \return Non-negative file descriptor of the accepted socket or a negative integer on failure
- */
-static int accept_retry(int lsock, struct sockaddr *restrict address,
-	socklen_t *restrict addrlen) {
-	int csock;
-
-	do {
-		csock = accept_flags(lsock, address, addrlen);
-	} while (unlikely(csock < 0 && errno == EINTR));
-
-	return csock;
 }
 
 static int accept_safe(struct ny_tcp *restrict tcp,
 	struct sockaddr *restrict address, socklen_t *restrict addrlen) {
 	int _;
 
-	int csock = accept_retry(tcp->io.fd, address, addrlen);
+	int csock = ny_io_accept(tcp->io.fd, address, addrlen);
 
 	/* Reject connection if out of file descriptors */
 	if (unlikely(csock < 0 && (errno == EMFILE || errno == ENFILE))) {
 		int save = errno;
-		_ = close_retry(tcp->goat);
+		_ = ny_io_close(tcp->goat);
 		assert(!_);
 
-		csock = accept_retry(tcp->io.fd, address, addrlen);
+		csock = ny_io_accept(tcp->io.fd, address, addrlen);
 		if (likely(csock >= 0))
-			close_retry(csock);
+			ny_io_close(csock);
 
 		tcp->goat = goat_new();
 		errno = save;
@@ -240,7 +158,7 @@ static void listen_event(EV_P_ struct ev_io *io, int revents) {
 			if (tcp->tcp_connect) {
 				if (unlikely(!tcp->tcp_connect(tcp, &address))) {
 					/* Reject connection */
-					close_retry(fd);
+					ny_io_close(fd);
 					continue;
 				}
 			}
@@ -252,7 +170,7 @@ static void listen_event(EV_P_ struct ev_io *io, int revents) {
 					tcp->tcp_error(tcp, &tcp->ny->error);
 
 				/* Close connection */
-				close_retry(fd);
+				ny_io_close(fd);
 				break;
 			}
 
@@ -313,7 +231,7 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 		if (likely(!bind(fd, rp->ai_addr, rp->ai_addrlen)))
 			break;
 
-		close_retry(fd);
+		ny_io_close(fd);
 	}
 
 	if (fd < 0) {
@@ -321,11 +239,11 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 		goto exit;
 	}
 
-	/* Close socket on exec */
-	ny_fd_set(fd, FD_CLOEXEC);
-
 	/* Mark socket as non-blocking */
-	ny_fl_set(fd, O_NONBLOCK);
+	ny_io_fl_set(fd, O_NONBLOCK);
+
+	/* Close socket on exec */
+	ny_io_fd_set(fd, FD_CLOEXEC);
 
 	/* Initialise I/O watcher */
 	ev_io_init(&tcp->io, listen_event, fd, EV_READ);
@@ -353,14 +271,14 @@ void ny_tcp_destroy(struct ny_tcp *restrict tcp) {
 	int _;
 
 	/* Close socket */
-	_ = close_retry(tcp->io.fd);
+	_ = ny_io_close(tcp->io.fd);
 	assert(_);
 
 	/* Destroy allocator */
 	ny_alloc_destroy(&tcp->alloc_con);
 
 	/* Close reserve file descriptor */
-	_ = close_retry(tcp->goat);
+	_ = ny_io_close(tcp->goat);
 	assert(_);
 }
 
@@ -393,7 +311,7 @@ void ny_tcp_con_destroy(struct ny_tcp_con *restrict con) {
 	ev_timer_stop(con->tcp->ny->loop, &con->timer);
 
 	/* Close socket */
-	close_retry(con->io.fd);
+	ny_io_close(con->io.fd);
 
 	/* Free structure */
 	free(con);
@@ -411,12 +329,7 @@ ssize_t ny_tcp_con_recv(struct ny_tcp_con *restrict con,
 	assert(con);
 	assert(buffer);
 
-	ssize_t rlen;
-
-	do {
-		rlen = read(con->io.fd, buffer, length);
-	} while (unlikely(rlen < 0 && errno == EINTR));
-
+	ssize_t rlen = ny_io_read(con->io.fd, buffer, length);
 	if (unlikely(rlen < 0))
 		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
 
@@ -432,12 +345,7 @@ ssize_t ny_tcp_con_send(struct ny_tcp_con *restrict con,
 	assert(con);
 	assert(buffer);
 
-	ssize_t wlen;
-
-	do {
-		wlen = write(con->io.fd, buffer, length);
-	} while (unlikely(wlen < 0 && errno == EINTR));
-
+	ssize_t wlen = ny_io_write(con->io.fd, buffer, length);
 	if (unlikely(wlen < 0))
 		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
 
@@ -449,72 +357,17 @@ ssize_t ny_tcp_con_send(struct ny_tcp_con *restrict con,
 }
 
 ssize_t ny_tcp_con_sendfile(struct ny_tcp_con *restrict con,
-	int fd, off_t offset, size_t length) {
+	int fd, size_t length, off_t offset) {
 	assert(con);
 	assert(fd >= 0);
 
-	int _;
-	ssize_t wlen = -1;
-
-#if NY_TCP_SENDFILE_LINUX
-	wlen = sendfile(con->io.fd, fd, &offset, length);
-#elif NY_TCP_SENDFILE_BSD
-	off_t sbytes;
-	_ = sendfile(con->io.fd, fd, offset, length, nil, &sbytes, 0);
-	if (likely(!_))
-		wlen = sbytes;
-#else
-#	if NY_TCP_SENDFILE_MMAP
-	/* Emulate sendfile with mmap and write */
-	void *buffer = mmap(nil, length, PROT_READ, MAP_SHARED, fd, offset);
-	if (unlikely(map == MAP_FAILED)) {
+	ssize_t wlen = ny_io_sendfile(con->io.fd, fd, length, offset);
+	if (unlikely(wlen < 0))
 		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
-		goto exit;
-	}
-
-	posix_madvise(buffer, length, POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
-#	else
-	/* Emulate sendfile with read and write */
-	ssize_t rlen;
-
-	/* Limit buffer size */
-	if (length > 1024)
-		length = 1024;
-
-	/* FIXME: Place the buffer somewhere else */
-	uint8_t buffer[length];
-
-	do {
-		rlen = pread(fd, buffer, length, offset);
-	} while (unlikely(rlen < 0 && errno == EINTR));
-
-	if (unlikely(rlen < 0)) {
-		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
-		goto exit;
-	}
-
-	length = rlen;
-#	endif
-
-	do {
-		wlen = write(con->io.fd, buffer, length);
-	} while (unlikely(wlen < 0 && errno == EINTR));
-#endif
-
-	if (unlikely(wlen < 0)) {
-		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
-		goto unmap;
-	}
 
 	/* Reset timeout */
-	ny_tcp_con_touch(con);
+	else if (likely(wlen > 0))
+		ny_tcp_con_touch(con);
 
-unmap:;
-#if NY_TCP_SENDFILE_MMAP
-	_ = munmap(buffer, length);
-	assert(!_);
-#endif
-
-exit:
 	return wlen;
 }
