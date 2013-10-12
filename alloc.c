@@ -23,10 +23,7 @@
 
 #include <nyanttp/ny.h>
 #include <nyanttp/alloc.h>
-
-static defy_const size_t align(size_t size, size_t alignment) {
-	return (size + alignment - (size_t) 1) & ~(alignment - (size_t) 1);
-}
+#include <nyanttp/util.h>
 
 static defy_const size_t max(size_t a, size_t b) {
 	return a > b ? a : b;
@@ -75,12 +72,12 @@ int ny_alloc_init(struct ny_alloc *restrict alloc, struct ny *restrict ny,
 	}
 
 	/* Minimum size of 4 bytes, aligned to word size */
-	alloc->size = align(max(size, sizeof (uint32_t)), sizeof (void *));
+	alloc->size = ny_util_align(max(size, sizeof (uint32_t)), sizeof (void *));
 
 	/* Size of payload without guard pages */
 	size_t payload =
 #if NY_ALLOC_ALIGN
-		align(number * alloc->size, ny->page_size);
+		ny_util_align(number * alloc->size, ny->page_size);
 #else
 		number * alloc->size;
 #endif
