@@ -14,9 +14,8 @@ int main(int argc, char *argv[]) {
 	ny_alloc_init(&alloc, &ny, 1021, 23);
 
 	ny_alloc_destroy(&alloc);
-	assert(alloc.raw == nil);
 	assert(alloc.pool == nil);
-	assert(alloc.alloc == 0);
+	assert(alloc.memsize == 0);
 
 	return EXIT_SUCCESS;
 }
