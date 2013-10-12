@@ -17,6 +17,14 @@
 #include <netinet/tcp.h>
 #include <netdb.h>
 
+#if NY_TCP_SENDFILE_LINUX
+#	include <sys/sendfile.h>
+#elif NY_TCP_SENDFILE_BSD
+#	include <sys/uio.h>
+#elif NY_TCP_SENDFILE_MMAP
+#	include <sys/mman.h>
+#endif
+
 #include <defy/expect>
 #include <defy/nil>
 #include <defy/restrict>
@@ -439,4 +447,73 @@ ssize_t ny_tcp_con_send(struct ny_tcp_con *restrict con,
 	return wlen;
 }
 
+ssize_t ny_tcp_con_sendfile(struct ny_tcp_con *restrict con,
+	int fd, off_t offset, size_t length) {
+	assert(con);
+	assert(fd >= 0);
 
+	int _;
+	ssize_t wlen = -1;
+
+#if NY_TCP_SENDFILE_LINUX
+	wlen = sendfile(con->io.fd, fd, &offset, length);
+#elif NY_TCP_SENDFILE_BSD
+	off_t sbytes;
+	_ = sendfile(con->io.fd, fd, offset, length, nil, &sbytes, 0);
+	if (likely(!_))
+		wlen = sbytes;
+#else
+#	if NY_TCP_SENDFILE_MMAP
+	/* Emulate sendfile with mmap and write */
+	void *buffer = mmap(nil, length, PROT_READ, MAP_SHARED, fd, offset);
+	if (unlikely(map == MAP_FAILED)) {
+		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+		goto exit;
+	}
+
+	posix_madvise(buffer, length, POSIX_MADV_SEQUENTIAL | POSIX_MADV_WILLNEED);
+#	else
+	/* Emulate sendfile with read and write */
+	ssize_t rlen;
+
+	/* Limit buffer size */
+	if (length > 1024)
+		length = 1024;
+
+	/* FIXME: Place the buffer somewhere else */
+	uint8_t buffer[length];
+
+	do {
+		rlen = pread(fd, buffer, length, offset);
+	} while (unlikely(rlen < 0 && errno == EINTR));
+
+	if (unlikely(rlen < 0)) {
+		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+		goto exit;
+	}
+
+	length = rlen;
+#	endif
+
+	do {
+		wlen = write(con->io.fd, buffer, length);
+	} while (unlikely(wlen < 0 && errno == EINTR));
+#endif
+
+	if (unlikely(wlen < 0)) {
+		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+		goto unmap;
+	}
+
+	/* Reset timeout */
+	ny_tcp_con_touch(con);
+
+unmap:;
+#if NY_TCP_SENDFILE_MMAP
+	_ = munmap(buffer, length);
+	assert(!_);
+#endif
+
+exit:
+	return wlen;
+}
