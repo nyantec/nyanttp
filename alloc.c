@@ -12,9 +12,9 @@
 
 #include <sys/mman.h>
 
-#include <defy/const>
 #include <defy/expect>
 #include <defy/nil>
+#include <defy/perfect>
 #include <defy/pure>
 
 #include <nyanttp/ny.h>
@@ -22,11 +22,11 @@
 #include <nyanttp/util.h>
 #include <nyanttp/mem.h>
 
-static defy_const size_t max(size_t a, size_t b) {
+static perfect size_t max(size_t a, size_t b) {
 	return a > b ? a : b;
 }
 
-static defy_pure void *index(struct ny_alloc const *restrict alloc, uint32_t idx) {
+static pure void *index(struct ny_alloc const *restrict alloc, uint32_t idx) {
 	/* Calculate octet offset */
 	size_t offset = alloc->size * idx;
 
@@ -36,7 +36,7 @@ static defy_pure void *index(struct ny_alloc const *restrict alloc, uint32_t idx
 	return alloc->pool + offset;
 }
 
-static defy_pure uint32_t pointer(struct ny_alloc const *restrict alloc, void *ptr) {
+static pure uint32_t pointer(struct ny_alloc const *restrict alloc, void *ptr) {
 	/* Lower bound */
 	assert(((uintptr_t) ptr) >= ((uintptr_t) alloc->pool));
 

@@ -14,8 +14,8 @@ extern "C" {
 
 #include <ev.h>
 
-#include <defy/const>
 #include <defy/nothrow>
+#include <defy/perfect>
 #include <defy/restrict>
 
 #include <nyanttp/error.h>
@@ -49,21 +49,21 @@ struct ny {
  *
  * \return Major version number
  */
-extern unsigned int ny_version_major() nothrow defy_const;
+extern unsigned int ny_version_major() nothrow perfect;
 
 /**
  * \brief Get minor version number
  *
  * \return Minor version number
  */
-extern unsigned int ny_version_minor() nothrow defy_const;
+extern unsigned int ny_version_minor() nothrow perfect;
 
 /**
  * \brief Get micro version number
  *
  * \return Micro version number
  */
-extern unsigned int ny_version_micro() nothrow defy_const;
+extern unsigned int ny_version_micro() nothrow perfect;
 
 /**
  * \brief Initialise context

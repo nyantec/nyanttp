@@ -14,7 +14,7 @@ extern "C" {
 
 #include <stddef.h>
 
-#include <defy/const>
+#include <defy/perfect>
 
 /**
  * \brief Align value
@@ -24,7 +24,7 @@ extern "C" {
  *
  * \return Aligned value
  */
-extern defy_const size_t ny_util_align(size_t value, size_t align);
+extern perfect size_t ny_util_align(size_t value, size_t align);
 
 #if defined __cplusplus
 }
