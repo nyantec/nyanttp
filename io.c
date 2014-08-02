@@ -14,9 +14,7 @@
 #include <sys/mman.h>
 #include <sys/socket.h>
 
-#include <defy/expect>
-#include <defy/nil>
-#include <defy/restrict>
+#include <nyanttp/expect.h>
 
 static int fcntl_set(int fd, int get, int set, int flags) {
 	int ret = fcntl(fd, get);
@@ -136,9 +134,9 @@ int ny_io_accept(int lsock, struct sockaddr *restrict address,
 }
 
 void *ny_io_mmap_ro(int fd, size_t length, off_t offset) {
-	void *memory = mmap(nil, length, PROT_READ, MAP_SHARED, fd, offset);
+	void *memory = mmap(NULL, length, PROT_READ, MAP_SHARED, fd, offset);
 	if (unlikely(memory == MAP_FAILED))
-		memory = nil;
+		memory = NULL;
 
 	return memory;
 }

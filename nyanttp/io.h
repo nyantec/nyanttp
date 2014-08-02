@@ -14,8 +14,6 @@ extern "C" {
 
 #include <stddef.h>
 
-#include <defy/restrict>
-
 /**
  * \brief Set file descriptor flags
  *

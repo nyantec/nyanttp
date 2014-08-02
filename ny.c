@@ -13,13 +13,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <defy/expect>
-#include <defy/nil>
-#include <defy/restrict>
-
 #include <ev.h>
 
 #include <nyanttp/ny.h>
+#include <nyanttp/expect.h>
 
 unsigned int ny_version_major() {
 	return NY_VERSION_MAJOR;
@@ -79,7 +76,7 @@ void ny_destroy(struct ny *restrict ny) {
 
 	assert(ny->loop);
 	ev_loop_destroy(ny->loop);
-	ny->loop = nil;
+	ny->loop = NULL;
 }
 
 static void child_event(struct ev_loop *loop, struct ev_child *child,

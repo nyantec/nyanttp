@@ -12,21 +12,19 @@
 
 #include <sys/mman.h>
 
-#include <defy/expect>
-#include <defy/nil>
-#include <defy/perfect>
-#include <defy/pure>
-
 #include <nyanttp/ny.h>
 #include <nyanttp/alloc.h>
+#include <nyanttp/const.h>
+#include <nyanttp/expect.h>
+#include <nyanttp/pure.h>
 #include <nyanttp/util.h>
 #include <nyanttp/mem.h>
 
-static perfect size_t max(size_t a, size_t b) {
+static ny_const size_t max(size_t a, size_t b) {
 	return a > b ? a : b;
 }
 
-static pure void *index(struct ny_alloc const *restrict alloc, uint32_t idx) {
+static ny_pure void *index(struct ny_alloc const *restrict alloc, uint32_t idx) {
 	/* Calculate octet offset */
 	size_t offset = alloc->size * idx;
 
@@ -36,7 +34,7 @@ static pure void *index(struct ny_alloc const *restrict alloc, uint32_t idx) {
 	return alloc->pool + offset;
 }
 
-static pure uint32_t pointer(struct ny_alloc const *restrict alloc, void *ptr) {
+static ny_pure uint32_t pointer(struct ny_alloc const *restrict alloc, void *ptr) {
 	/* Lower bound */
 	assert(((uintptr_t) ptr) >= ((uintptr_t) alloc->pool));
 
@@ -113,14 +111,14 @@ void ny_alloc_destroy(struct ny_alloc *restrict alloc) {
 	_ = ny_mem_free(alloc->pool, alloc->memsize);
 	assert(!_);
 
-	alloc->pool = nil;
+	alloc->pool = NULL;
 	alloc->memsize = 0;
 }
 
 void *ny_alloc_acquire(struct ny_alloc *restrict alloc) {
 	assert(alloc);
 
-	void *object = nil;
+	void *object = NULL;
 
 	/* Any objects remaining? */
 	if (likely(alloc->free != UINT32_MAX)) {

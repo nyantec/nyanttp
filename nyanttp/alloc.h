@@ -14,8 +14,6 @@ extern "C" {
 
 #include <stdint.h>
 
-#include <defy/restrict>
-
 /**
  * \brief Allocation pool
  */

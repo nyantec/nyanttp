@@ -6,11 +6,11 @@
 extern "C" {
 #endif
 
+#include <stdbool.h>
+
 #include <netinet/ip6.h>
 
 #include <ev.h>
-
-#include <defy/bool>
 
 #include <nyanttp/ny.h>
 #include <nyanttp/error.h>

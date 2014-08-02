@@ -14,8 +14,6 @@ extern "C" {
 
 #include <stddef.h>
 
-#include <defy/restrict>
-
 extern void *ny_mem_alloc(size_t length);
 extern int ny_mem_free(void *restrict memory, size_t length);
 

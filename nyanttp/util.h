@@ -14,7 +14,7 @@ extern "C" {
 
 #include <stddef.h>
 
-#include <defy/perfect>
+#include <nyanttp/const.h>
 
 /**
  * \brief Align value
@@ -24,7 +24,7 @@ extern "C" {
  *
  * \return Aligned value
  */
-inline perfect size_t ny_util_align(size_t size, size_t align) {
+inline ny_const size_t ny_util_align(size_t size, size_t align) {
 	return (size + align - (size_t) 1) & ~(align - (size_t) 1);
 }
 

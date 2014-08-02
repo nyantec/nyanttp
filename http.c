@@ -9,10 +9,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <defy/expect>
-#include <defy/nil>
-
 #include <nyanttp/ny.h>
+#include <nyanttp/expect.h>
 #include <nyanttp/http.h>
 
 int ny_http_init(struct ny_http *restrict http,
@@ -23,7 +21,7 @@ int ny_http_init(struct ny_http *restrict http,
 	int _;
 	int status = -1;
 
-	http->data = nil;
+	http->data = NULL;
 
 	status = 0;
 
@@ -36,10 +34,10 @@ int ny_http_con_init(struct ny_http_con *restrict con,
 	assert(con);
 	assert(http);
 
-	con->data = nil;
+	con->data = NULL;
 	con->http = http;
 
-	con->buffer = nil;
+	con->buffer = NULL;
 	con->offset = 0;
 	con->length = 0;
 }

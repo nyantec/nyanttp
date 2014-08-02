@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#include <defy/nothrow>
+#include <nyanttp/nothrow.h>
 
 /**
  * \brief Error domain
@@ -53,7 +53,7 @@ struct ny_error {
  * thread-local buffer and may be overwritten by a subsequent call to the
  * function in the same thread.
  */
-extern char const *ny_error(struct ny_error const *restrict error) nothrow;
+extern char const *ny_error(struct ny_error const *restrict error) ny_nothrow;
 
 /**
  * \brief Get error message string, reentrant version
@@ -69,7 +69,7 @@ extern char const *ny_error(struct ny_error const *restrict error) nothrow;
  * used to store the string.
  */
 extern char const *ny_error_r(struct ny_error const *restrict error, char
-		*restrict buffer, size_t length) nothrow;
+		*restrict buffer, size_t length) ny_nothrow;
 
 /**
  * \internal

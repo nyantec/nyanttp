@@ -8,15 +8,12 @@
 
 #include <sys/mman.h>
 
-#include <defy/expect>
-#include <defy/nil>
-#include <defy/restrict>
-
+#include <nyanttp/expect.h>
 #include <nyanttp/mem.h>
 #include <nyanttp/util.h>
 
 void *ny_mem_alloc(size_t length) {
-	void *memory = nil;
+	void *memory = NULL;
 
 #if NY_MEM_ALLOC_GUARD
 	long pagesize = sysconf(_SC_PAGESIZE);
@@ -27,7 +24,7 @@ void *ny_mem_alloc(size_t length) {
 	size_t alloc = length;
 #endif
 
-	void *base = mmap(nil, alloc, PROT_READ | PROT_WRITE,
+	void *base = mmap(NULL, alloc, PROT_READ | PROT_WRITE,
 		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
 	if (unlikely(base == MAP_FAILED))

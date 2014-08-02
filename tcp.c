@@ -26,11 +26,8 @@
 #	include <sys/mman.h>
 #endif
 
-#include <defy/expect>
-#include <defy/nil>
-#include <defy/restrict>
-
 #include <nyanttp/ny.h>
+#include <nyanttp/expect.h>
 #include <nyanttp/tcp.h>
 #include <nyanttp/io.h>
 
@@ -175,7 +172,7 @@ static void listen_event(EV_P_ struct ev_io *io, int revents) {
 			}
 
 			/* Initialise user-data pointer */
-			con->data = nil;
+			con->data = NULL;
 
 			/* Initialise timeout watcher */
 			ev_timer_init(&con->timer, timeout_event,
@@ -203,14 +200,14 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 	int ret = -1;
 
 	/* Initialise structure */
-	tcp->data = nil;
+	tcp->data = NULL;
 	tcp->ny = ny;
-	tcp->tcp_error = nil;
-	tcp->tcp_connect = nil;
-	tcp->con_error = nil;
-	tcp->con_readable = nil;
-	tcp->con_writable = nil;
-	tcp->con_timeout = nil;
+	tcp->tcp_error = NULL;
+	tcp->tcp_connect = NULL;
+	tcp->con_error = NULL;
+	tcp->con_readable = NULL;
+	tcp->con_writable = NULL;
+	tcp->con_timeout = NULL;
 
 	struct addrinfo *res;
 

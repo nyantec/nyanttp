@@ -14,11 +14,9 @@ extern "C" {
 
 #include <ev.h>
 
-#include <defy/nothrow>
-#include <defy/perfect>
-#include <defy/restrict>
-
+#include <nyanttp/const.h>
 #include <nyanttp/error.h>
+#include <nyanttp/nothrow.h>
 
 /**
  * \brief Major version number

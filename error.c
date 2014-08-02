@@ -11,15 +11,14 @@
 
 #include <netdb.h>
 
-#include <defy/expect>
-#include <defy/thread_local>
-
+#include <nyanttp/local.h>
 #include <nyanttp/error.h>
+#include <nyanttp/expect.h>
 
 /**
  * \brief Error message buffer
  */
-static thread_local char error_buf[256];
+static ny_local char error_buf[256];
 
 /**
  * \brief Error message map
