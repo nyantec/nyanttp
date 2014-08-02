@@ -10,6 +10,4 @@
 
 #include <nyanttp/util.h>
 
-size_t ny_util_align(size_t size, size_t align) {
-	return (size + align - (size_t) 1) & ~(align - (size_t) 1);
-}
+extern perfect inline size_t ny_util_align(size_t size, size_t align);
