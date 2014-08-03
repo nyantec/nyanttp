@@ -319,7 +319,7 @@ void ny_tcp_con_destroy(struct ny_tcp_con *restrict con) {
 	ny_io_close(con->io.fd);
 
 	/* Free structure */
-	free(con);
+	ny_alloc_release(&con->tcp->alloc_con, con);
 }
 
 void ny_tcp_con_touch(struct ny_tcp_con *restrict con) {
