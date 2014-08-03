@@ -284,15 +284,17 @@ void ny_tcp_destroy(struct ny_tcp *restrict tcp) {
 int ny_tcp_listen(struct ny_tcp *restrict tcp) {
 	assert(tcp);
 
-	int ret = 0;
+	int ret = -1;
 
 	/* Listen on socket */
 	if (listen(tcp->io.fd, SOMAXCONN)) {
-		ret = errno;
+		ny_error_set(&tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
 		goto exit;
 	}
 
 	ev_io_start(tcp->ny->loop, &tcp->io);
+
+	ret = 0;
 
 exit:
 	return ret;
