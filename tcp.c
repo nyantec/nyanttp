@@ -208,6 +208,7 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 	tcp->tcp_error = NULL;
 	tcp->tcp_connect = NULL;
 	tcp->con_error = NULL;
+	tcp->con_destroy = NULL;
 	tcp->con_readable = NULL;
 	tcp->con_writable = NULL;
 	tcp->con_timeout = NULL;
