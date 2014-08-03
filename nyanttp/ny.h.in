@@ -47,21 +47,21 @@ struct ny {
  *
  * \return Major version number
  */
-extern unsigned int ny_version_major() nothrow perfect;
+extern unsigned int ny_version_major() ny_const ny_nothrow;
 
 /**
  * \brief Get minor version number
  *
  * \return Minor version number
  */
-extern unsigned int ny_version_minor() nothrow perfect;
+extern unsigned int ny_version_minor() ny_const ny_nothrow;
 
 /**
  * \brief Get micro version number
  *
  * \return Micro version number
  */
-extern unsigned int ny_version_micro() nothrow perfect;
+extern unsigned int ny_version_micro() ny_const ny_nothrow;
 
 /**
  * \brief Initialise context
@@ -77,14 +77,14 @@ extern unsigned int ny_version_micro() nothrow perfect;
 		: (ny_error_set(&(ny)->error, NY_ERROR_DOMAIN_NY, NY_ERROR_VERSION), -1) \
 )
 
-extern int ny_init_(struct ny *restrict ny) nothrow;
+extern int ny_init_(struct ny *restrict ny) ny_nothrow;
 
 /**
  * \brief Destroy context
  *
  * \param[in,out] ny Pointer to context structure
  */
-extern void ny_destroy(struct ny *restrict ny) nothrow;
+extern void ny_destroy(struct ny *restrict ny) ny_nothrow;
 
 /**
  * \brief Run ny
@@ -94,7 +94,7 @@ extern void ny_destroy(struct ny *restrict ny) nothrow;
  *
  * \return Zero on success or non-zero on error
  */
-extern int ny_run(struct ny *restrict ny, unsigned nproc) nothrow;
+extern int ny_run(struct ny *restrict ny, unsigned nproc) ny_nothrow;
 
 #if defined __cplusplus
 }
