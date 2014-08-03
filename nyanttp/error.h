@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 #include <nyanttp/nothrow.h>
 
 /**
