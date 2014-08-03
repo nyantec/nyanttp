@@ -255,6 +255,8 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 	/* Duplicate standard input as a reserve file descriptor */
 	tcp->goat = goat_new();
 
+	ret = 0;
+
 exit:
 	if (likely(res))
 		freeaddrinfo(res);
