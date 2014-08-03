@@ -174,6 +174,9 @@ static void listen_event(EV_P_ struct ev_io *io, int revents) {
 			/* Initialise user-data pointer */
 			con->data = NULL;
 
+			/* Set TCP context pointer */
+			con->tcp = tcp;
+
 			/* Initialise timeout watcher */
 			ev_timer_init(&con->timer, timeout_event,
 				NY_TCP_TIMEOUT, NY_TCP_TIMEOUT);
