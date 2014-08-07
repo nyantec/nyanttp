@@ -30,6 +30,10 @@ unsigned int ny_version_micro() {
 	return NY_VERSION_MICRO;
 }
 
+char const *ny_version_build() {
+	return NY_VERSION_BUILD;
+}
+
 /**
  * \brief Real context initialisation
  *

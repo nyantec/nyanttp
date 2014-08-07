@@ -36,6 +36,11 @@ extern "C" {
 #define NY_VERSION_MICRO @NY_VERSION_MICRO@u
 
 /**
+ * \brief Build identifier
+ */
+#define NY_VERSION_BUILD "@NY_VERSION_BUILD@"
+
+/**
  * \brief Context structure
  */
 struct ny {
@@ -64,6 +69,13 @@ extern unsigned int ny_version_minor() ny_const ny_nothrow;
  * \return Micro version number
  */
 extern unsigned int ny_version_micro() ny_const ny_nothrow;
+
+/**
+ * \brief Get build identifier
+ *
+ * \return Build identifier
+ */
+extern char const *ny_version_build() ny_const ny_nothrow;
 
 /**
  * \brief Initialise context
