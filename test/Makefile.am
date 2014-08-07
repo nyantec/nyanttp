@@ -1,6 +1,6 @@
 @INC_AMINCLUDE@
 
-CPPFLAGS = -I$(top_builddir) -I$(top_srcdir)
+AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir)
 LDADD = $(top_builddir)/libny.la
 
 check_PROGRAMS = \
