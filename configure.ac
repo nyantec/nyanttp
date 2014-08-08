@@ -24,8 +24,10 @@ AC_PROG_LIBTOOL
 AX_AM_JOBSERVER
 
 AC_SYS_LARGEFILE
-AC_DEFINE([_XOPEN_SOURCE], [700], [Expose POSIX and XSI extensions.])
+AC_DEFINE([_POSIX_C_SOURCE], [200809l], [Expose POSIX.1-2008 definitions.])
+AC_DEFINE([_XOPEN_SOURCE], [700], [Expose XSI extensions.])
 AC_DEFINE([_GNU_SOURCE], [1], [Expose GNU extensions.])
+AC_DEFINE([_DARWIN_C_SOURCE], [1], [Expose Darwin extensions.])
 
 AC_SEARCH_LIBS([socket], [socket nsl])
 AC_SEARCH_LIBS([getaddrinfo], [socket nsl])
