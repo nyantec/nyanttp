@@ -8,6 +8,7 @@ extern "C" {
 
 #include <stdbool.h>
 
+#include <sys/types.h>
 #include <netinet/ip6.h>
 
 #include <ev.h>
