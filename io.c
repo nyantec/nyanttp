@@ -14,6 +14,12 @@
 #include <sys/mman.h>
 #include <sys/socket.h>
 
+#if NY_TCP_SENDFILE_LINUX
+#	include <sys/sendfile.h>
+#elif NY_TCP_SENDFILE_BSD
+#	include <sys/uio.h>
+#endif
+
 #include <nyanttp/expect.h>
 
 static int fcntl_set(int fd, int get, int set, int flags) {

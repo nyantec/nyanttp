@@ -18,14 +18,6 @@
 #include <netinet/tcp.h>
 #include <netdb.h>
 
-#if NY_TCP_SENDFILE_LINUX
-#	include <sys/sendfile.h>
-#elif NY_TCP_SENDFILE_BSD
-#	include <sys/uio.h>
-#elif NY_TCP_SENDFILE_MMAP
-#	include <sys/mman.h>
-#endif
-
 #include <nyanttp/ny.h>
 #include <nyanttp/expect.h>
 #include <nyanttp/tcp.h>
