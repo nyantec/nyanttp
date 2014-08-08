@@ -217,20 +217,21 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 	for (struct addrinfo *rp = res; rp; rp = rp->ai_next) {
 		/* Create socket */
 		fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-		if (unlikely(fd < 0))
+		if (unlikely(fd < 0)) {
+			ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
 			continue;
+		}
 
 		/* Bind to socket */
 		if (likely(!bind(fd, rp->ai_addr, rp->ai_addrlen)))
 			break;
 
+		ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
 		ny_io_close(fd);
 	}
 
-	if (fd < 0) {
-		/* FIXME: Define error code */
+	if (fd < 0)
 		goto exit;
-	}
 
 	/* Mark socket as non-blocking */
 	ny_io_fl_set(fd, O_NONBLOCK);
