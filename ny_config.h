@@ -1,7 +1,3 @@
-#define _POSIX_C_SOURCE 200809l
-#define _XOPEN_SOURCE 700
-#define _DARWIN_C_SOURCE
-
 #if HAVE_FORK
 #	define NY_MPROC 1
 #endif
