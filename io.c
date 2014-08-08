@@ -48,7 +48,7 @@ int ny_io_open(char const *restrict path, int flags) {
 	} while (unlikely(fd < 0 && errno == EINTR));
 
 #if !defined(O_CLOEXEC)
-	int _ = ny_fd_set(fd, FD_CLOEXEC);
+	int _ = ny_io_fd_set(fd, FD_CLOEXEC);
 	assert(!_);
 #endif
 
@@ -122,10 +122,10 @@ int ny_io_accept(int lsock, struct sockaddr *restrict address,
 #if !HAVE_ACCEPT4
 	if (likely(csock >= 0)) {
 		int _;
-		_ = ny_fl_set(csock, O_NONBLOCK);
+		_ = ny_io_fl_set(csock, O_NONBLOCK);
 		assert(!_);
 
-		_ = ny_fd_set(csock, FD_CLOEXEC);
+		_ = ny_io_fd_set(csock, FD_CLOEXEC);
 		assert(!_);
 	}
 #endif
