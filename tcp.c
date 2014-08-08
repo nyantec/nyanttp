@@ -328,8 +328,16 @@ ssize_t ny_tcp_con_recv(struct ny_tcp_con *restrict con,
 	assert(buffer);
 
 	ssize_t rlen = ny_io_read(con->io.fd, buffer, length);
-	if (unlikely(rlen < 0))
-		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+	if (unlikely(rlen == 0)) {
+		rlen = -1;
+		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_NY, NY_ERROR_EOF);
+	}
+	else if (unlikely(rlen < 0)) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			rlen = 0;
+		else
+			ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+	}
 
 	/* Reset timeout */
 	else if (likely(rlen > 0))
@@ -344,8 +352,12 @@ ssize_t ny_tcp_con_send(struct ny_tcp_con *restrict con,
 	assert(buffer);
 
 	ssize_t wlen = ny_io_write(con->io.fd, buffer, length);
-	if (unlikely(wlen < 0))
-		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+	if (unlikely(wlen < 0)) {
+		if (errno == EINTR || errno == EWOULDBLOCK)
+			wlen = 0;
+		else
+			ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+	}
 
 	/* Reset timeout */
 	else if (likely(wlen > 0))
@@ -360,8 +372,12 @@ ssize_t ny_tcp_con_sendfile(struct ny_tcp_con *restrict con,
 	assert(fd >= 0);
 
 	ssize_t wlen = ny_io_sendfile(con->io.fd, fd, length, offset);
-	if (unlikely(wlen < 0))
-		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+	if (unlikely(wlen < 0)) {
+		if (errno == EINTR || errno == EWOULDBLOCK)
+			wlen = 0;
+		else
+			ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+	}
 
 	/* Reset timeout */
 	else if (likely(wlen > 0))
