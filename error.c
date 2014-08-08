@@ -27,7 +27,8 @@ static char const *const error_map[] = {
 	[NY_ERROR_VERSION] = "ny version mismatch",
 	[NY_ERROR_EVVER] = "libev version mismatch",
 	[NY_ERROR_EVINIT] = "Failed to initialise libev event loop",
-	[NY_ERROR_EVWATCH] = "libev watcher stopped"
+	[NY_ERROR_EVWATCH] = "libev watcher stopped",
+	[NY_ERROR_EOF] = "End of file"
 };
 
 char const *ny_error_r(struct ny_error const *restrict error, char *restrict buffer, size_t length) {
