@@ -32,6 +32,9 @@ static char const *const error_map[] = {
 };
 
 char const *ny_error_r(struct ny_error const *restrict error, char *restrict buffer, size_t length) {
+	assert(error);
+	assert(buffer);
+
 	char const *string = "Unknown error";
 
 	switch (error->domain) {
