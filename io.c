@@ -23,6 +23,8 @@
 #include <nyanttp/expect.h>
 
 static int fcntl_set(int fd, int get, int set, int flags) {
+	assert(fd >= 0);
+
 	int ret = fcntl(fd, get);
 	if (unlikely(ret < 0))
 		goto exit;
@@ -42,6 +44,8 @@ int ny_io_fl_set(int fd, int flags) {
 }
 
 int ny_io_open(char const *restrict path, int flags) {
+	assert(path);
+
 	int fd;
 
 	do {
@@ -62,6 +66,8 @@ int ny_io_open(char const *restrict path, int flags) {
 }
 
 int ny_io_close(int fd) {
+	assert(fd >= 0);
+
 	int ret;
 
 	do {
@@ -72,6 +78,10 @@ int ny_io_close(int fd) {
 }
 
 ssize_t ny_io_read(int fd, void *restrict buffer, size_t length) {
+	assert(fd >= 0);
+	assert(buffer);
+	assert(length <= SSIZE_MAX);
+
 	ssize_t rlen;
 
 	do {
@@ -82,6 +92,11 @@ ssize_t ny_io_read(int fd, void *restrict buffer, size_t length) {
 }
 
 ssize_t ny_io_pread(int fd, void *restrict buffer, size_t length, off_t offset) {
+	assert(fd >= 0);
+	assert(buffer);
+	assert(length <= SSIZE_MAX);
+	assert(offset >= 0);
+
 	ssize_t rlen;
 
 	do {
@@ -92,6 +107,10 @@ ssize_t ny_io_pread(int fd, void *restrict buffer, size_t length, off_t offset) 
 }
 
 ssize_t ny_io_write(int fd, void const *restrict buffer, size_t length) {
+	assert(fd >= 0);
+	assert(buffer);
+	assert(length <= SSIZE_MAX);
+
 	ssize_t wlen;
 
 	do {
@@ -103,6 +122,11 @@ ssize_t ny_io_write(int fd, void const *restrict buffer, size_t length) {
 
 ssize_t ny_io_pwrite(int fd, void const *restrict buffer, size_t length,
 	off_t offset) {
+	assert(fd >= 0);
+	assert(buffer);
+	assert(length <= SSIZE_MAX);
+	assert(offset >= 0);
+
 	ssize_t wlen;
 
 	do {
@@ -114,6 +138,9 @@ ssize_t ny_io_pwrite(int fd, void const *restrict buffer, size_t length,
 
 int ny_io_accept(int lsock, struct sockaddr *restrict address,
 	socklen_t *restrict addrlen) {
+	assert(lsock >= 0);
+	assert(addrlen && (*addrlen >= 0));
+
 	int csock;
 
 	do {
@@ -140,6 +167,10 @@ int ny_io_accept(int lsock, struct sockaddr *restrict address,
 }
 
 void *ny_io_mmap_ro(int fd, size_t length, off_t offset) {
+	assert(fd >= 0);
+	assert(length > 0);
+	assert(offset >= 0);
+
 	void *memory = mmap(NULL, length, PROT_READ, MAP_SHARED, fd, offset);
 	if (unlikely(memory == MAP_FAILED))
 		memory = NULL;
@@ -148,6 +179,11 @@ void *ny_io_mmap_ro(int fd, size_t length, off_t offset) {
 }
 
 ssize_t ny_io_sendfile(int out, int in, size_t length, off_t offset) {
+	assert(out >= 0);
+	assert(in >= 0);
+	assert(length <= SSIZE_MAX);
+	assert(offset >= 0);
+
 	ssize_t wlen = -1;
 
 #if NY_IO_SENDFILE_LINUX
