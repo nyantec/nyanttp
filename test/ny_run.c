@@ -1,8 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <defy/nil>
-
 #include <nyanttp/ny.h>
 
 int main(int argc, char *argv[]) {

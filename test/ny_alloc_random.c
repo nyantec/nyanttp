@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <defy/nil>
-
 #include <nyanttp/ny.h>
 #include <nyanttp/alloc.h>
 
@@ -12,7 +10,7 @@ int main(int argc, char *argv[]) {
 	uint_least16_t const len = 16;
 
 	void **ptr = calloc(num, sizeof (void *));
-	assert(ptr != nil);
+	assert(ptr != NULL);
 
 	struct ny ny;
 	ny_init(&ny);
@@ -25,7 +23,7 @@ int main(int argc, char *argv[]) {
 		for (size_t iter = 0; iter < num; ++iter) {
 			if (!ptr[iter] && random() % 4 == 0) {
 				ptr[iter] = ny_alloc_acquire(&alloc);
-				assert(ptr[iter] != nil);
+				assert(ptr[iter] != NULL);
 				memset(ptr[iter], 0x02, len);
 			}
 		}
@@ -34,7 +32,7 @@ int main(int argc, char *argv[]) {
 		for (size_t iter = 0; iter < num; ++iter) {
 			if (ptr[iter] && random() % 4 == 0) {
 				ny_alloc_release(&alloc, ptr[iter]);
-				ptr[iter] = nil;
+				ptr[iter] = NULL;
 			}
 		}
 	}

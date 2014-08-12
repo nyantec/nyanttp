@@ -1,8 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <defy/nil>
-
 #include <nyanttp/ny.h>
 #include <nyanttp/alloc.h>
 
@@ -14,7 +12,7 @@ int main(int argc, char *argv[]) {
 	ny_alloc_init(&alloc, &ny, 1021, 23);
 
 	ny_alloc_destroy(&alloc);
-	assert(alloc.pool == nil);
+	assert(alloc.pool == NULL);
 	assert(alloc.memsize == 0);
 
 	return EXIT_SUCCESS;

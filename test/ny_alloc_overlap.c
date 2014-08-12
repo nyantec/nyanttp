@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <defy/nil>
-
 #include <nyanttp/ny.h>
 #include <nyanttp/alloc.h>
 
@@ -12,7 +10,7 @@ int main(int argc, char *argv[]) {
 	uint_least16_t const len = 64;
 
 	uint8_t **ptr = calloc(num, sizeof (uint8_t *));
-	assert(ptr != nil);
+	assert(ptr != NULL);
 
 	struct ny ny;
 	ny_init(&ny);
@@ -23,7 +21,7 @@ int main(int argc, char *argv[]) {
 	/* Acquire objects */
 	for (size_t iter = 0; iter < num; ++iter) {
 		ptr[iter] = ny_alloc_acquire(&alloc);
-		assert(ptr[iter] != nil);
+		assert(ptr[iter] != NULL);
 
 		/* Check for overlaps */
 		memset(ptr[iter], 0xff, len);

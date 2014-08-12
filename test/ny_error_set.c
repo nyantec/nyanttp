@@ -3,16 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <defy/nil>
-
 #include <nyanttp/ny.h>
 #include <nyanttp/error.h>
 
 int main(int argc, char *argv[]) {
 	struct ny_error error;
 	ny_error_set(&error, NY_ERROR_DOMAIN_ERRNO, ENOTSUP);
-	assert(error.file != nil);
-	assert(error.func != nil);
+	assert(error.file != NULL);
+	assert(error.func != NULL);
 	assert(!strcmp(error.file, __FILE__));
 	assert(!strcmp(error.func, __func__));
 	assert(error.line == __LINE__ - 5);
