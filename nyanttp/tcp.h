@@ -17,6 +17,9 @@ extern "C" {
 #include <nyanttp/error.h>
 #include <nyanttp/alloc.h>
 
+#define NY_TCP_READABLE EV_READ
+#define NY_TCP_WRITABLE EV_WRITE
+
 struct ny_tcp;
 struct ny_tcp_con;
 
@@ -79,6 +82,9 @@ extern int ny_tcp_listen(struct ny_tcp *restrict tcp);
 extern void ny_tcp_con_destroy(struct ny_tcp_con *restrict con);
 
 extern void ny_tcp_con_touch(struct ny_tcp_con *restrict con);
+
+extern void ny_tcp_con_events(struct ny_tcp_con *restrict con, 
+	int events);
 
 extern ssize_t ny_tcp_con_recv(struct ny_tcp_con *restrict con,
 	void *restrict buffer, size_t length);

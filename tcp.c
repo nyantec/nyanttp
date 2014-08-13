@@ -322,6 +322,16 @@ void ny_tcp_con_touch(struct ny_tcp_con *restrict con) {
 	ev_timer_again(con->tcp->ny->loop, &con->timer);
 }
 
+void ny_tcp_con_events(struct ny_tcp_con *restrict con, int events) {
+	assert(con);
+	assert(events);
+	assert((events & ~(NY_TCP_READABLE | NY_TCP_WRITABLE)) == 0);
+
+	ev_io_stop(con->tcp->ny->loop, &con->io);
+	ev_io_set(&con->io, &con->io.fd, events);
+	ev_io_start(con->tcp->ny->loop, &con->io);
+}
+
 ssize_t ny_tcp_con_recv(struct ny_tcp_con *restrict con,
 	void *restrict buffer, size_t length) {
 	assert(con);
