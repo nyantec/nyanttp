@@ -11,6 +11,8 @@
 
 #include <netdb.h>
 
+#include <gnutls/gnutls.h>
+
 #include <nyanttp/local.h>
 #include <nyanttp/error.h>
 #include <nyanttp/expect.h>
@@ -63,6 +65,10 @@ char const *ny_error_r(struct ny_error const *restrict error, char *restrict buf
 
 	case NY_ERROR_DOMAIN_GAI:
 		string = gai_strerror(error->code);
+		break;
+
+	case NY_ERROR_DOMAIN_GTLS:
+		string = gnutls_strerror(error->code);
 		break;
 	}
 

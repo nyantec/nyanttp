@@ -22,7 +22,8 @@ extern "C" {
 enum ny_error_domain {
 	NY_ERROR_DOMAIN_NY, /**< ny internal error */
 	NY_ERROR_DOMAIN_ERRNO, /**< Error code as defined in errno.h */
-	NY_ERROR_DOMAIN_GAI /**< getaddrinfo() error */
+	NY_ERROR_DOMAIN_GAI, /**< getaddrinfo() error */
+	NY_ERROR_DOMAIN_GTLS /**< GnuTLS error */
 };
 
 enum ny_error_nyan {
