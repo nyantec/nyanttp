@@ -222,6 +222,15 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 			continue;
 		}
 
+		/* Allow address reuse */
+		int value = 1;
+		if (unlikely(setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &value,
+			sizeof (value)))) {
+			ny_error_set(&ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+			ny_io_close(fd);
+			continue;
+		}
+
 		/* Bind to socket */
 		if (likely(!bind(fd, rp->ai_addr, rp->ai_addrlen)))
 			break;
