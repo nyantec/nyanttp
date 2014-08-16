@@ -181,6 +181,10 @@ static void listen_event(EV_P_ struct ev_io *io, int revents) {
 			ev_set_priority(&con->io, NY_TCP_ACCEPT_PRIO);
 			con->io.data = con;
 			ev_io_start(EV_A_ &con->io);
+
+			/* Emit connect event */
+			if (tcp->con_connect)
+				tcp->con_connect(con);
 		}
 	}
 }
@@ -201,6 +205,7 @@ int ny_tcp_init(struct ny_tcp *restrict tcp, struct ny *restrict ny,
 	tcp->tcp_connect = NULL;
 	tcp->con_error = NULL;
 	tcp->con_destroy = NULL;
+	tcp->con_connect = NULL;
 	tcp->con_readable = NULL;
 	tcp->con_writable = NULL;
 	tcp->con_timeout = NULL;

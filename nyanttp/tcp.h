@@ -39,6 +39,7 @@ struct ny_tcp {
 	void (*con_error)(struct ny_tcp_con *restrict,
 		struct ny_error const *restrict);
 	void (*con_destroy)(struct ny_tcp_con *restrict);
+	void (*con_connect)(struct ny_tcp_con *restrict);
 	void (*con_readable)(struct ny_tcp_con *restrict);
 	void (*con_writable)(struct ny_tcp_con *restrict);
 	bool (*con_timeout)(struct ny_tcp_con *restrict);
