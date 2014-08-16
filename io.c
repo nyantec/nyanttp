@@ -92,6 +92,19 @@ ssize_t ny_io_read(int fd, void *restrict buffer, size_t length) {
 	return rlen;
 }
 
+ssize_t ny_io_readv(int fd, struct iovec const *restrict vector, size_t count) {
+	assert(fd >= 0);
+	assert(vector);
+
+	ssize_t rlen;
+
+	do {
+		rlen = readv(fd, vector, count);
+	} while (unlikely(rlen < 0 && errno == EINTR));
+
+	return rlen;
+}
+
 ssize_t ny_io_pread(int fd, void *restrict buffer, size_t length, off_t offset) {
 	assert(fd >= 0);
 	assert(buffer);
@@ -116,6 +129,19 @@ ssize_t ny_io_write(int fd, void const *restrict buffer, size_t length) {
 
 	do {
 		wlen = write(fd, buffer, length);
+	} while (unlikely(wlen < 0 && errno == EINTR));
+
+	return wlen;
+}
+
+ssize_t ny_io_writev(int fd, struct iovec const *restrict vector, size_t count) {
+	assert(fd >= 0);
+	assert(vector);
+
+	ssize_t wlen;
+
+	do {
+		wlen = writev(fd, vector, count);
 	} while (unlikely(wlen < 0 && errno == EINTR));
 
 	return wlen;

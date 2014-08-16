@@ -14,6 +14,8 @@ extern "C" {
 
 #include <stddef.h>
 
+#include <sys/uio.h>
+
 /**
  * \brief Set file descriptor flags
  *
@@ -54,10 +56,14 @@ extern int ny_io_open(char const *restrict path, int flags);
 extern int ny_io_close(int fd);
 
 extern ssize_t ny_io_read(int fd, void *restrict buffer, size_t length);
+extern ssize_t ny_io_readv(int fd, struct iovec const *restrict vector,
+	size_t count);
 extern ssize_t ny_io_pread(int fd, void *restrict buffer, size_t length,
 	off_t offset);
 
 extern ssize_t ny_io_write(int fd, void const *restrict buffer, size_t length);
+extern ssize_t ny_io_writev(int fd, struct iovec const *restrict vector,
+	size_t count);
 extern ssize_t ny_io_pwrite(int fd, void const *restrict buffer, size_t length,
 	off_t offset);
 
