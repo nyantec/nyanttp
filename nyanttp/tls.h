@@ -36,11 +36,10 @@ struct ny_tls {
 	void (*sess_writable)(struct ny_tls_sess *restrict);
 	bool (*sess_timeout)(struct ny_tls_sess *restrict);
 
-	ssize_t (*sess_recv)(struct ny_tls_sess *restrict,
-		void *restrict, size_t);
-	ssize_t (*sess_send)(struct ny_tls_sess *restrict,
-		void const *restrict, size_t);
-	void (*sess_close)(struct ny_tls_sess *restrict);
+	ssize_t (*trans_recv)(void *restrict, void *restrict, size_t);
+	ssize_t (*trans_send_vec)(void *restrict,
+		struct iovec const *restrict, size_t);
+	void (*trans_close)(void *restrict);
 };
 
 /**
@@ -48,6 +47,7 @@ struct ny_tls {
  */
 struct ny_tls_sess {
 	void *data; /**< User data */
+	void *trans; /**< Transport data */
 	struct ny_tls *tls; /**< TLS listener */
 	gnutls_session_t session; /**< GnuTLS session */
 	bool handshake;
@@ -72,9 +72,13 @@ extern void ny_tls_destroy(struct ny_tls *restrict tls);
 
 extern int ny_tls_listen(struct ny_tls *restrict tls);
 
-extern int ny_tls_connect(struct ny_tls *restrict tls);
+extern void ny_tls_connect(struct ny_tls *restrict tls, void *restrict trans);
 
 extern void ny_tls_sess_destroy(struct ny_tls_sess *restrict sess);
+
+extern void ny_tls_sess_readable(struct ny_tls_sess *restrict sess);
+
+extern void ny_tls_sess_writable(struct ny_tls_sess *restrict sess);
 
 extern ssize_t ny_tls_sess_recv(struct ny_tls_sess *restrict sess,
 	void *restrict buffer, size_t length);

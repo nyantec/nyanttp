@@ -27,9 +27,10 @@ int ny_tls_init(struct ny_tls *restrict tls, struct ny *restrict ny,
 	tls->sess_destroy = NULL;
 	tls->sess_readable = NULL;
 	tls->sess_writable = NULL;
-	tls->sess_recv = NULL;
-	tls->sess_send = NULL;
-	tls->sess_close = NULL;
+
+	tls->trans_recv = NULL;
+	tls->trans_send_vec = NULL;
+	tls->trans_close = NULL;
 
 	/* Initialise GnuTLS */
 	gnutls_global_init();
@@ -89,14 +90,77 @@ void ny_tls_destroy(struct ny_tls *restrict tls) {
 	gnutls_global_deinit();
 }
 
+void ny_tls_connect(struct ny_tls *restrict tls, void *restrict trans) {
+	assert(tls);
+
+	int _;
+
+	struct ny_tls_sess *sess = ny_alloc_acquire(&tls->alloc_sess);
+	if (unlikely(!sess)) {
+		if (tls->tls_error)
+			tls->tls_error(tls, &tls->ny->error);
+		goto close;
+	}
+
+	sess->data = NULL;
+	sess->trans = trans;
+	sess->tls = tls;
+
+	_ = gnutls_init(&sess->session, GNUTLS_SERVER);
+	if (unlikely(_)) {
+		if (tls->tls_error) {
+			struct ny_error error;
+			ny_error_set(&error, NY_ERROR_DOMAIN_GTLS, _);
+			tls->tls_error(tls, &error);
+		}
+
+		goto close;
+	}
+
+	_ = gnutls_priority_set(sess->session, tls->prio_cache);
+	if (unlikely(_)) {
+		if (tls->tls_error) {
+			struct ny_error error;
+			ny_error_set(&error, NY_ERROR_DOMAIN_GTLS, _);
+			tls->tls_error(tls, &error);
+		}
+
+		goto deinit;
+	}
+
+	/* TODO: Credentials */
+
+	/* Setup transport layer */
+	/* FIXME: Depends on errno being set */
+	gnutls_transport_set_ptr(sess->session, trans);
+	gnutls_transport_set_pull_function(sess->session,
+		(gnutls_pull_func) tls->trans_recv);
+	gnutls_transport_set_vec_push_function(sess->session,
+		(gnutls_vec_push_func) tls->trans_send_vec);
+
+	goto exit;
+
+deinit:
+	gnutls_deinit(sess->session);
+
+close:
+	tls->trans_close(trans);
+
+release:
+	ny_alloc_release(&tls->alloc_sess, sess);
+
+exit:
+	return;
+}
+
 void ny_tls_sess_destroy(struct ny_tls_sess *restrict sess) {
 	assert(sess);
-	assert(sess->tls->sess_close);
+	assert(sess->tls->trans_close);
 
 	if (sess->tls->sess_destroy)
 		sess->tls->sess_destroy(sess);
 
-	sess->tls->sess_close(sess);
+	sess->tls->trans_close(sess->trans);
 
 	/* Free session structure */
 	ny_alloc_release(&sess->tls->alloc_sess, sess);
