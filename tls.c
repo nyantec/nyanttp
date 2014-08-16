@@ -190,6 +190,49 @@ exit:
 	return;
 }
 
+static void gtls_handshake(struct ny_tls_sess *restrict sess) {
+	int _;
+
+	if (!sess->handshake) {
+		_ = gnutls_handshake(sess->session);
+		if (unlikely(_)) {
+			if (likely(_ == GNUTLS_E_AGAIN)) {
+				/* FIXME: Define independent event codes */
+				sess->tls->trans_event(sess->trans,
+					gnutls_record_get_direction(sess->session) ?
+						NY_TCP_WRITABLE : NY_TCP_READABLE);
+			}
+			else if (sess->tls->sess_error) {
+				struct ny_error error;
+				ny_error_set(&error, NY_ERROR_DOMAIN_GTLS, _);
+				sess->tls->sess_error(sess, &error);
+			}
+
+			return;
+		}
+
+		sess->handshake = true;
+	}
+}
+
+void ny_tls_sess_readable(struct ny_tls_sess *restrict sess) {
+	assert(sess);
+
+	gtls_handshake(sess);
+
+	if (sess->tls->sess_readable)
+		sess->tls->sess_readable(sess);
+}
+
+void ny_tls_sess_writable(struct ny_tls_sess *restrict sess) {
+	assert (sess);
+
+	gtls_handshake(sess);
+
+	if (sess->tls->sess_writable)
+		sess->tls->sess_writable(sess);
+}
+
 void ny_tls_sess_destroy(struct ny_tls_sess *restrict sess) {
 	assert(sess);
 	assert(sess->tls->trans_close);

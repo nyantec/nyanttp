@@ -39,6 +39,7 @@ struct ny_tls {
 	ssize_t (*trans_recv)(void *restrict, void *restrict, size_t);
 	ssize_t (*trans_send_vec)(void *restrict,
 		struct iovec const *restrict, size_t);
+	void (*trans_event)(void *restrict, int);
 	void (*trans_close)(void *restrict);
 };
 
