@@ -95,6 +95,7 @@ ssize_t ny_io_read(int fd, void *restrict buffer, size_t length) {
 ssize_t ny_io_readv(int fd, struct iovec const *restrict vector, size_t count) {
 	assert(fd >= 0);
 	assert(vector);
+	assert(count <= IOV_MAX);
 
 	ssize_t rlen;
 
@@ -137,6 +138,7 @@ ssize_t ny_io_write(int fd, void const *restrict buffer, size_t length) {
 ssize_t ny_io_writev(int fd, struct iovec const *restrict vector, size_t count) {
 	assert(fd >= 0);
 	assert(vector);
+	assert(count <= IOV_MAX);
 
 	ssize_t wlen;
 
