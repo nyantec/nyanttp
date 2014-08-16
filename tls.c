@@ -211,6 +211,7 @@ static void gtls_handshake(struct ny_tls_sess *restrict sess) {
 			return;
 		}
 
+		/* FIXME: Reset events */
 		sess->handshake = true;
 	}
 }
@@ -244,4 +245,48 @@ void ny_tls_sess_destroy(struct ny_tls_sess *restrict sess) {
 
 	/* Free session structure */
 	ny_alloc_release(&sess->tls->alloc_sess, sess);
+}
+
+ssize_t ny_tls_sess_recv(struct ny_tls_sess *restrict sess, 
+	void *restrict buffer, size_t length) {
+	assert(sess);
+	assert(buffer);
+
+	ssize_t rlen = gnutls_record_recv(sess->session, buffer, length);
+	if (unlikely(rlen == 0)) {
+		rlen = -1;
+		ny_error_set(&sess->tls->ny->error, NY_ERROR_DOMAIN_NY, NY_ERROR_EOF);
+	}
+	else if (unlikely(rlen < 0)) {
+		if (rlen == GNUTLS_E_AGAIN)
+			rlen = 0;
+		else if (rlen == GNUTLS_E_REHANDSHAKE) {
+			sess->handshake = false;
+			gtls_handshake(sess);
+		}
+		else
+			ny_error_set(&sess->tls->ny->error, NY_ERROR_DOMAIN_GTLS, rlen);
+	}
+
+	return rlen;
+}
+
+ssize_t ny_tls_sess_send(struct ny_tls_sess *restrict sess,
+	void const *restrict buffer, size_t length) {
+	assert(sess);
+	assert(buffer);
+
+	ssize_t wlen = gnutls_record_send(sess->session, buffer, length);
+	if (unlikely(wlen < 0)) {
+		if (wlen == GNUTLS_E_AGAIN)
+			wlen = 0;
+		else if (wlen == GNUTLS_E_REHANDSHAKE) {
+			sess->handshake = false;
+			gtls_handshake(sess);
+		}
+		else
+			ny_error_set(&sess->tls->ny->error, NY_ERROR_DOMAIN_GTLS, wlen);
+	}
+
+	return wlen;
 }

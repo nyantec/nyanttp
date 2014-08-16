@@ -85,7 +85,7 @@ extern ssize_t ny_tls_sess_recv(struct ny_tls_sess *restrict sess,
 	void *restrict buffer, size_t length);
 
 extern ssize_t ny_tls_sess_send(struct ny_tls_sess *restrict sess,
-	void *restrict buffer, size_t length);
+	void const *restrict buffer, size_t length);
 
 extern ssize_t ny_tls_sess_sendfile(struct ny_tls_sess *restrict sess,
 	int fd, size_t length, off_t offset);
