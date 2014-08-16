@@ -7,6 +7,7 @@
 #include "config.h"
 
 #include <assert.h>
+#include <errno.h>
 
 #include <nyanttp/tls.h>
 #include <nyanttp/expect.h>
@@ -90,6 +91,43 @@ void ny_tls_destroy(struct ny_tls *restrict tls) {
 	gnutls_global_deinit();
 }
 
+static ssize_t gtls_recv(struct ny_tls_sess *restrict sess,
+	void *restrict buffer, size_t length) {
+	assert(sess);
+
+	ssize_t rlen = sess->tls->trans_recv(sess->trans, buffer, length);
+	if (unlikely(rlen == 0)) {
+		rlen = -1;
+		gnutls_transport_set_errno(sess->session, EAGAIN);
+	}
+	else if (unlikely(rlen < 0)) {
+		gnutls_transport_set_errno(sess->session,
+			likely(sess->tls->ny->error.domain == NY_ERROR_DOMAIN_ERRNO) ?
+				sess->tls->ny->error.code : EINVAL );
+	}
+
+	return rlen;
+}
+
+static ssize_t gtls_send_vec(struct ny_tls_sess *restrict sess,
+	struct iovec const *restrict vector, size_t count) {
+	assert(sess);
+	assert(vector);
+
+	ssize_t wlen = sess->tls->trans_send_vec(sess->trans, vector, count);
+	if (unlikely(wlen == 0)) {
+		wlen = -1;
+		gnutls_transport_set_errno(sess->session, EAGAIN);
+	}
+	else if (unlikely(wlen < 0)) {
+		gnutls_transport_set_errno(sess->session,
+			likely(sess->tls->ny->error.domain == NY_ERROR_DOMAIN_ERRNO) ?
+				sess->tls->ny->error.code : EINVAL );
+	}
+
+	return wlen;
+}
+
 void ny_tls_connect(struct ny_tls *restrict tls, void *restrict trans) {
 	assert(tls);
 
@@ -131,12 +169,11 @@ void ny_tls_connect(struct ny_tls *restrict tls, void *restrict trans) {
 	/* TODO: Credentials */
 
 	/* Setup transport layer */
-	/* FIXME: Depends on errno being set */
-	gnutls_transport_set_ptr(sess->session, trans);
+	gnutls_transport_set_ptr(sess->session, sess);
 	gnutls_transport_set_pull_function(sess->session,
-		(gnutls_pull_func) tls->trans_recv);
+		(gnutls_pull_func) gtls_recv);
 	gnutls_transport_set_vec_push_function(sess->session,
-		(gnutls_vec_push_func) tls->trans_send_vec);
+		(gnutls_vec_push_func) gtls_send_vec);
 
 	goto exit;
 
