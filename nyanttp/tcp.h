@@ -90,8 +90,14 @@ extern void ny_tcp_con_events(struct ny_tcp_con *restrict con,
 extern ssize_t ny_tcp_con_recv(struct ny_tcp_con *restrict con,
 	void *restrict buffer, size_t length);
 
+extern ssize_t ny_tcp_con_recv_vec(struct ny_tcp_con *restrict con,
+	struct iovec const *restrict vector, size_t count);
+
 extern ssize_t ny_tcp_con_send(struct ny_tcp_con *restrict con,
 	void const *restrict buffer, size_t length);
+
+extern ssize_t ny_tcp_con_send_vec(struct ny_tcp_con *restrict con,
+	struct iovec const *restrict vector, size_t count);
 
 extern ssize_t ny_tcp_con_sendfile(struct ny_tcp_con *restrict con,
 	int fd, size_t length, off_t offset);

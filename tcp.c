@@ -370,12 +370,56 @@ ssize_t ny_tcp_con_recv(struct ny_tcp_con *restrict con,
 	return rlen;
 }
 
+ssize_t ny_tcp_con_recv_vec(struct ny_tcp_con *restrict con,
+	struct iovec const *restrict vector, size_t count) {
+	assert(con);
+	assert(vector);
+
+	ssize_t rlen = ny_io_readv(con->io.fd, vector, count);
+	if (unlikely(rlen == 0)) {
+		rlen = -1;
+		ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_NY, NY_ERROR_EOF);
+	}
+	else if (unlikely(rlen < 0)) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			rlen = 0;
+		else
+			ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+	}
+
+	/* Reset timeout */
+	else if (likely(rlen > 0))
+		ny_tcp_con_touch(con);
+
+	return rlen;
+}
+
 ssize_t ny_tcp_con_send(struct ny_tcp_con *restrict con,
 	void const *restrict buffer, size_t length) {
 	assert(con);
 	assert(buffer);
 
 	ssize_t wlen = ny_io_write(con->io.fd, buffer, length);
+	if (unlikely(wlen < 0)) {
+		if (errno == EINTR || errno == EWOULDBLOCK)
+			wlen = 0;
+		else
+			ny_error_set(&con->tcp->ny->error, NY_ERROR_DOMAIN_ERRNO, errno);
+	}
+
+	/* Reset timeout */
+	else if (likely(wlen > 0))
+		ny_tcp_con_touch(con);
+
+	return wlen;
+}
+
+ssize_t ny_tcp_con_send_vec(struct ny_tcp_con *restrict con,
+	struct iovec const *restrict vector, size_t count) {
+	assert(con);
+	assert(vector);
+
+	ssize_t wlen = ny_io_writev(con->io.fd, vector, count);
 	if (unlikely(wlen < 0)) {
 		if (errno == EINTR || errno == EWOULDBLOCK)
 			wlen = 0;
