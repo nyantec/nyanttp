@@ -1,0 +1,15 @@
+language: c
+
+compile:
+    - clang
+    - gcc
+
+before_script:
+    - sudo apt-get update -qq
+    - sudo apt-get install -y libev-dev libgnutls-dev
+
+script:
+    - autoreconf -i
+    - ./configure
+    - make
+    - make check
