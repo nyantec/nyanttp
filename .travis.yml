@@ -11,6 +11,6 @@ install:
     - sudo apt-get install libev-dev libgnutls-dev
 
 before_script:
-    - git fetch --tags
+    - git fetch --depth=1024 --tags
 
 script: "autoreconf -i -I m4 && ./configure && make && make check"
