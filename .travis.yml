@@ -6,6 +6,6 @@ compile:
 
 before_script:
     - sudo apt-get update -qq
-    - sudo apt-get install -y libev-dev libgnutls-dev
+    - sudo apt-get install libev-dev libgnutls-dev
 
 script: "autoreconf -i -I m4 && ./configure && make && make check"
