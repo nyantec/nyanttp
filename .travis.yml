@@ -4,8 +4,10 @@ compile:
     - clang
     - gcc
 
-before_script:
+before_install:
     - sudo apt-get update -qq
+
+install:
     - sudo apt-get install libev-dev libgnutls-dev
 
 script: "autoreconf -i -I m4 && ./configure && make && make check"
